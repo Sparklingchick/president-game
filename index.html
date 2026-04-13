@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
+<title>COMMANDER IN CHIEF</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+<style>
+
+:root{--bg:#070b14;--s1:#0c1220;--s2:#111a2e;--bdr:#1a2540;--gold:#c8a020;--g2:#f0cc60;--txt:#ddd8c4;--dim:#55607a;--grn:#18a86a;--red:#c83030;--blu:#2060d0;--cyn:#18a0b8}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow-x:hidden;font-size:14px}
+body{background:var(--bg);color:var(--txt);font-family:'Rajdhani',sans-serif;min-height:100vh}
+.screen{display:none}
+/* START */
+#start{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem 1.5rem;text-align:center;background:radial-gradient(ellipse at 30% 20%,rgba(20,40,100,.4) 0%,transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(80,40,0,.3) 0%,transparent 60%)}
+.s-logo{font-size:3.5rem;margin-bottom:.5rem;filter:drop-shadow(0 0 30px rgba(200,160,32,.5))}
+.s-pre{font-size:.6rem;letter-spacing:.5em;color:var(--gold);margin-bottom:.3rem}
+.s-title{font-size:clamp(2.5rem,11vw,5rem);font-weight:900;color:#fff;text-shadow:0 0 60px rgba(200,160,32,.4);letter-spacing:.08em;line-height:.95}
+.s-sub{font-style:italic;color:var(--gold);margin:.5rem 0 2rem;font-size:1rem}
+.sform{width:100%;max-width:400px}
+.ig{margin-bottom:.8rem;text-align:left}
+.ig label{display:block;font-size:.6rem;letter-spacing:.2em;color:var(--gold);margin-bottom:.3rem}
+.ig input,.ig select{width:100%;padding:.7rem 1rem;background:var(--s2);border:1px solid var(--bdr);color:var(--txt);font-family:'Rajdhani',sans-serif;font-size:.95rem;border-radius:4px}
+.ig input:focus,.ig select:focus{outline:none;border-color:var(--gold)}
+.ig select option{background:var(--s2)}
+.btn-assume{width:100%;padding:1rem;margin-top:.8rem;background:var(--gold);color:#000;font-weight:700;font-size:.9rem;letter-spacing:.15em;border:none;border-radius:4px;cursor:pointer}
+.btn-assume:active{background:var(--g2)}
+.s-note{margin-top:1.5rem;color:var(--dim);font-size:.78rem;max-width:360px;line-height:1.6}
+/* TOPBAR */
+#game{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.topbar{background:var(--s1);border-bottom:1px solid var(--bdr);padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:.5rem}
+.tb-l .tbn{font-size:.75rem;font-weight:700;color:#fff;letter-spacing:.05em}
+.tb-l .tbc{font-size:.62rem;color:var(--gold);margin-top:1px}
+.tb-c{text-align:center}
+.tb-date{font-family:'Share Tech Mono',monospace;font-size:.8rem;color:var(--dim)}
+.tb-turn{font-size:.56rem;color:var(--gold);letter-spacing:.1em}
+.tb-r{display:flex;gap:.4rem;align-items:center}
+.stat-pill{padding:.22rem .55rem;border-radius:4px;font-size:.72rem;font-family:'Share Tech Mono',monospace;font-weight:bold;white-space:nowrap;border:1px solid transparent}
+/* TAB CONTENT */
+.tab-content{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:56px}
+.tab-panel{display:none;padding:.75rem}
+.tab-panel.active{display:block}
+/* BOTTOM TABS */
+.bottomtabs{position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--bdr);display:flex;z-index:50;height:52px}
+.btab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:.58rem;letter-spacing:.08em;color:var(--dim);transition:color .15s;border-top:2px solid transparent;padding:.3rem 0}
+.btab .bico{font-size:1.1rem;margin-bottom:1px}
+.btab.active{color:var(--gold);border-top-color:var(--gold)}
+/* CARDS */
+.card{background:var(--s1);border:1px solid var(--bdr);border-radius:8px;padding:.9rem;margin-bottom:.75rem}
+.card-title{font-size:.62rem;letter-spacing:.2em;color:var(--gold);margin-bottom:.7rem;display:flex;align-items:center;justify-content:space-between}
+/* STAT BARS */
+.sbar-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.45rem}
+.sbar-lbl{font-size:.7rem;color:var(--dim);width:90px;flex-shrink:0}
+.sbar-track{flex:1;height:6px;background:var(--bdr);border-radius:3px;overflow:hidden}
+.sbar-fill{height:100%;border-radius:3px;transition:width .5s}
+.sbar-val{font-family:'Share Tech Mono',monospace;font-size:.7rem;width:28px;text-align:right;flex-shrink:0}
+/* GRID */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.4rem}
+/* STAT BOX */
+.statbox{background:var(--s2);border:1px solid var(--bdr);border-radius:6px;padding:.55rem .65rem;text-align:center}
+.statbox .sbl{font-size:.58rem;color:var(--dim);letter-spacing:.1em;margin-bottom:.2rem}
+.statbox .sbv{font-family:'Share Tech Mono',monospace;font-size:.95rem;font-weight:bold}
+/* NATION CARDS */
+.ncard{background:var(--s2);border:1px solid var(--bdr);border-radius:6px;padding:.6rem .75rem;cursor:pointer;transition:border-color .15s;margin-bottom:.45rem;display:flex;align-items:center;gap:.6rem}
+.ncard:active,.ncard:hover{border-color:var(--gold)}
+.nflag{font-size:1.5rem;flex-shrink:0}
+.ninfo{flex:1;min-width:0}
+.nname{font-size:.82rem;font-weight:700;color:#fff}
+.nstatus{font-size:.64rem;margin-top:1px}
+.nrel-bar{margin-top:.3rem;height:4px;background:var(--bdr);border-radius:2px;overflow:hidden}
+.nrel-fill{height:100%;border-radius:2px;transition:width .4s}
+.nactions{display:flex;flex-direction:column;gap:.3rem;align-items:flex-end}
+/* BUTTONS */
+.btn{padding:.5rem .9rem;border-radius:4px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:.78rem;letter-spacing:.08em;border:1px solid;transition:all .15s;font-weight:600}
+.btn-gold{background:var(--gold);color:#000;border-color:var(--gold)}
+.btn-gold:active{background:var(--g2)}
+.btn-outline{background:transparent;color:var(--gold);border-color:var(--gold)}
+.btn-outline:active{background:rgba(200,160,32,.1)}
+.btn-red{background:rgba(200,48,48,.15);color:#e05050;border-color:rgba(200,48,48,.4)}
+.btn-red:active{background:rgba(200,48,48,.3)}
+.btn-green{background:rgba(24,168,106,.15);color:#18c878;border-color:rgba(24,168,106,.4)}
+.btn-blue{background:rgba(32,96,208,.15);color:#5090e0;border-color:rgba(32,96,208,.4)}
+.btn-sm{padding:.35rem .65rem;font-size:.7rem}
+.btn-full{width:100%;margin-top:.5rem;padding:.75rem}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+@media(min-width:500px){.modal-overlay{align-items:center}}
+.modal{background:var(--s1);border:1px solid var(--bdr);border-radius:12px 12px 0 0;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;padding:1.2rem}
+@media(min-width:500px){.modal{border-radius:12px;max-height:80vh}}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.modal-title{font-size:1rem;font-weight:700;color:#fff;letter-spacing:.05em}
+.modal-close{background:none;border:none;color:var(--dim);font-size:1.4rem;cursor:pointer;padding:.2rem .5rem;line-height:1}
+/* NEWS */
+.news-item{border-left:3px solid var(--bdr);padding:.45rem .7rem;margin-bottom:.5rem;border-radius:0 4px 4px 0}
+.news-item.crit{border-color:var(--red)}
+.news-item.warn{border-color:var(--gold)}
+.news-item.good{border-color:var(--grn)}
+.news-item.info{border-color:var(--blu)}
+.news-date{font-size:.6rem;color:var(--dim);font-family:'Share Tech Mono',monospace;margin-bottom:.15rem}
+.news-head{font-size:.82rem;font-weight:600;color:#fff;margin-bottom:.15rem}
+.news-body{font-size:.75rem;color:var(--txt);line-height:1.5}
+.news-fx{font-size:.65rem;font-family:'Share Tech Mono',monospace;margin-top:.25rem}
+/* DEV PANEL */
+.devpanel{background:rgba(255,200,0,.04);border:1px solid rgba(255,200,0,.2);border-radius:8px;padding:.9rem;margin-bottom:.75rem}
+.devpanel .dp-title{font-size:.6rem;letter-spacing:.2em;color:#ffd700;margin-bottom:.7rem}
+.dev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem}
+.dev-item label{display:block;font-size:.55rem;color:var(--dim);margin-bottom:.15rem;letter-spacing:.08em}
+.dev-item input{width:100%;padding:.3rem .4rem;background:var(--s2);border:1px solid var(--bdr);color:var(--txt);font-size:.75rem;border-radius:3px;font-family:'Share Tech Mono',monospace}
+/* DEPLOY LIST */
+.dep-card{background:var(--s2);border:1px solid var(--bdr);border-radius:6px;padding:.65rem;margin-bottom:.45rem}
+.dep-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:.3rem}
+.dep-loc{font-size:.82rem;font-weight:700;color:#fff}
+.dep-info{font-size:.7rem;color:var(--dim);margin-bottom:.3rem}
+/* LOAN LIST */
+.loan-card{background:var(--s2);border:1px solid var(--bdr);border-radius:6px;padding:.65rem;margin-bottom:.45rem}
+.loan-hdr{font-size:.82rem;font-weight:600;color:#fff;margin-bottom:.25rem;display:flex;justify-content:space-between}
+.loan-detail{font-size:.7rem;color:var(--dim)}
+/* RESOURCE ROW */
+.res-row{display:flex;align-items:center;justify-content:space-between;padding:.45rem 0;border-bottom:1px solid var(--bdr)}
+.res-row:last-child{border-bottom:none}
+.res-name{font-size:.78rem;font-weight:600}
+.res-stats{font-size:.68rem;color:var(--dim);font-family:'Share Tech Mono',monospace}
+/* DEAL ROWS */
+.deal-row{display:flex;justify-content:space-between;align-items:center;padding:.4rem 0;border-bottom:1px solid var(--bdr)}
+.deal-row:last-child{border-bottom:none}
+/* TAG */
+.tag{display:inline-block;padding:.12rem .4rem;border-radius:3px;font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.tag-ally{background:rgba(24,168,106,.15);color:#18c878;border:1px solid rgba(24,168,106,.3)}
+.tag-war{background:rgba(200,48,48,.18);color:#e05050;border:1px solid rgba(200,48,48,.4);animation:pulse .8s infinite}
+.tag-neutral{background:rgba(100,100,100,.15);color:#888;border:1px solid rgba(100,100,100,.2)}
+.tag-enemy{background:rgba(200,48,48,.1);color:#c05050;border:1px solid rgba(200,48,48,.25)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+/* AI LOADING */
+.ai-loading{display:flex;align-items:center;gap:.5rem;color:var(--cyn);font-size:.75rem;padding:.5rem 0}
+.ai-dot{width:6px;height:6px;border-radius:50%;background:var(--cyn);animation:bounce .8s infinite}
+.ai-dot:nth-child(2){animation-delay:.2s}
+.ai-dot:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+/* COLORS */
+.vg{color:#18c878}.vo{color:#18a86a}.vw{color:#d4a017}.vb{color:#c84040}.vc{color:#ff2020;animation:pulse .8s infinite}
+.t-gold{color:var(--gold)}.t-red{color:var(--red)}.t-green{color:var(--grn)}.t-blue{color:#5090e0}.t-dim{color:var(--dim)}
+
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="start" class="screen">
+  <div class="s-logo">🏛️</div>
+  <div class="s-pre">PRESIDENTIAL STRATEGY SIMULATION</div>
+  <div class="s-title">COMMANDER<br>IN CHIEF</div>
+  <div class="s-sub">Full control. Real consequences. Powered by AI.</div>
+  <div class="sform">
+    <div class="ig"><label>YOUR NAME</label><input id="iName" type="text" placeholder="e.g. Gideon Musa" maxlength="28"/></div>
+    <div class="ig"><label>YOUR COUNTRY</label>
+      <select id="iCtry">
+        <option value="Nigeria">🇳🇬 Federal Republic of Nigeria</option>
+        <option value="Ghana">🇬🇭 Republic of Ghana</option>
+        <option value="Kenya">🇰🇪 Republic of Kenya</option>
+        <option value="South Africa">🇿🇦 Republic of South Africa</option>
+        <option value="Custom">🌍 Custom Country</option>
+      </select></div>
+    <div class="ig" id="cGrp" style="display:none"><label>COUNTRY NAME</label><input id="iCustom" type="text" placeholder="Republic of..." maxlength="28"/></div>
+    <div class="ig"><label>DIFFICULTY</label>
+      <select id="iDiff">
+        <option value="normal">Normal</option>
+        <option value="hard">Hard</option>
+        <option value="brutal">Brutal</option>
+      </select></div>
+    <button class="btn-assume" onclick="startGame()">⚡ ASSUME COMMAND</button>
+  </div>
+  <p class="s-note">Buy weapons · Deploy troops · Form alliances · Declare war · Make deals · Take loans · Never-ending AI world · Type DEVMODE as your name to unlock developer controls</p>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="game" class="screen">
+  <div class="topbar">
+    <div class="tb-l">
+      <div class="tbn" id="tbName">President</div>
+      <div class="tbc" id="tbCtry">Country</div>
+    </div>
+    <div class="tb-c">
+      <div class="tb-date" id="tbDate">Jan 2025</div>
+      <div class="tb-turn" id="tbTurn">MONTH 1</div>
+    </div>
+    <div class="tb-r">
+      <div class="stat-pill" id="tbTreasury" style="background:rgba(200,160,32,.1);color:var(--gold);border-color:rgba(200,160,32,.2)">₦0B</div>
+      <div class="stat-pill" id="tbApproval" style="background:rgba(24,168,106,.1);color:var(--grn);border-color:rgba(24,168,106,.2)">0%</div>
+    </div>
+  </div>
+
+  <div class="tab-content">
+    <!-- OVERVIEW -->
+    <div class="tab-panel active" id="tpOverview">
+      <div id="devPanel" style="display:none"></div>
+      <div class="card"><div class="card-title">NATIONAL STATS <span id="ovMonth" class="t-dim" style="font-size:.65rem"></span></div><div id="ovStats"></div></div>
+      <div class="card"><div class="card-title">MILITARY OVERVIEW</div><div id="ovMil"></div></div>
+      <div class="card"><div class="card-title">ACTIVE DEPLOYMENTS <span id="depCount" class="t-gold"></span></div><div id="ovDeps"></div></div>
+      <div class="card"><div class="card-title">ACTIVE DEALS <span id="dealCount" class="t-gold"></span></div><div id="ovDeals"></div></div>
+      <button class="btn btn-gold btn-full" onclick="endMonth()" id="endMonthBtn">⏭ END MONTH</button>
+    </div>
+
+    <!-- MILITARY -->
+    <div class="tab-panel" id="tpMilitary">
+      <div class="card">
+        <div class="card-title">ARMED FORCES</div>
+        <div id="milForces"></div>
+        <div style="display:flex;gap:.5rem;margin-top:.7rem;flex-wrap:wrap">
+          <button class="btn btn-outline btn-sm" onclick="showRecruitModal()">+ RECRUIT TROOPS</button>
+          <button class="btn btn-blue btn-sm" onclick="showBuyWeaponModal()">🛒 BUY WEAPONS</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">DEPLOY TROOPS</div>
+        <p style="font-size:.75rem;color:var(--dim);margin-bottom:.7rem">Deploy your forces to allied nations, domestic states, or conflict zones with custom conditions.</p>
+        <button class="btn btn-gold btn-full" onclick="showDeployModal()">✈️ NEW DEPLOYMENT</button>
+      </div>
+      <div class="card">
+        <div class="card-title">ACTIVE DEPLOYMENTS</div>
+        <div id="milDeps"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">WEAPONS INVENTORY</div>
+        <div id="milWeapons"></div>
+      </div>
+    </div>
+
+    <!-- ECONOMY -->
+    <div class="tab-panel" id="tpEconomy">
+      <div class="card">
+        <div class="card-title">FINANCIAL SUMMARY</div>
+        <div id="ecoSummary"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">RESOURCES</div>
+        <div id="ecoResources"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">LOANS <span id="loanCount" class="t-dim" style="font-size:.65rem"></span></div>
+        <div id="ecoLoans"></div>
+        <button class="btn btn-outline btn-full" onclick="showLoanModal()">💰 TAKE NEW LOAN</button>
+      </div>
+    </div>
+
+    <!-- DIPLOMACY -->
+    <div class="tab-panel" id="tpDiplomacy">
+      <div class="card"><div class="card-title">WORLD NATIONS</div><div id="dipNations"></div></div>
+    </div>
+
+    <!-- INTEL -->
+    <div class="tab-panel" id="tpIntel">
+      <div id="intelFeed"></div>
+    </div>
+  </div>
+
+  <div class="bottomtabs">
+    <div class="btab active" onclick="switchTab('Overview')" id="bt0"><div class="bico">🗺️</div>OVERVIEW</div>
+    <div class="btab" onclick="switchTab('Military')" id="bt1"><div class="bico">⚔️</div>MILITARY</div>
+    <div class="btab" onclick="switchTab('Economy')" id="bt2"><div class="bico">💰</div>ECONOMY</div>
+    <div class="btab" onclick="switchTab('Diplomacy')" id="bt3"><div class="bico">🤝</div>DIPLOMACY</div>
+    <div class="btab" onclick="switchTab('Intel')" id="bt4"><div class="bico">📡</div>INTEL</div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="mOverlay" onclick="closeModal(event)">
+  <div class="modal" id="mBox">
+    <div class="modal-hdr">
+      <div class="modal-title" id="mTitle">Title</div>
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    </div>
+    <div id="mBody"></div>
+  </div>
+</div>
+
+<script>
+
+// ═══════════════════════════════════════════════════
+// GAME DATA
+// ═══════════════════════════════════════════════════
+
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+const NATIONS_DATA = [
+  {id:'ghana',name:'Ghana',flag:'🇬🇭',gdp:78,mil:35,region:'West Africa',resources:{oil:15,food:40,minerals:20,tech:10},baseRel:50},
+  {id:'cameroon',name:'Cameroon',flag:'🇨🇲',gdp:45,mil:30,region:'Central Africa',resources:{oil:30,food:35,minerals:15,tech:5},baseRel:35},
+  {id:'niger',name:'Niger',flag:'🇳🇪',gdp:14,mil:18,region:'West Africa',resources:{oil:8,food:20,minerals:40,tech:2},baseRel:30},
+  {id:'chad',name:'Chad',flag:'🇹🇩',gdp:11,mil:22,region:'Central Africa',resources:{oil:20,food:15,minerals:10,tech:1},baseRel:25},
+  {id:'benin',name:'Benin',flag:'🇧🇯',gdp:20,mil:12,region:'West Africa',resources:{oil:5,food:45,minerals:8,tech:3},baseRel:60},
+  {id:'southafrica',name:'South Africa',flag:'🇿🇦',gdp:420,mil:80,region:'Southern Africa',resources:{oil:10,food:30,minerals:80,tech:50},baseRel:45},
+  {id:'ethiopia',name:'Ethiopia',flag:'🇪🇹',gdp:110,mil:55,region:'East Africa',resources:{oil:5,food:60,minerals:20,tech:8},baseRel:40},
+  {id:'usa',name:'United States',flag:'🇺🇸',gdp:25000,mil:99,region:'North America',resources:{oil:80,food:90,minerals:70,tech:99},baseRel:40},
+  {id:'china',name:'China',flag:'🇨🇳',gdp:18000,mil:97,region:'East Asia',resources:{oil:50,food:70,minerals:80,tech:95},baseRel:55},
+  {id:'france',name:'France',flag:'🇫🇷',gdp:3000,mil:78,region:'Europe',resources:{oil:20,food:60,minerals:40,tech:80},baseRel:30},
+  {id:'russia',name:'Russia',flag:'🇷🇺',gdp:1800,mil:95,region:'Europe/Asia',resources:{oil:90,food:50,minerals:70,tech:75},baseRel:25},
+  {id:'morocco',name:'Morocco',flag:'🇲🇦',gdp:130,mil:45,region:'North Africa',resources:{oil:10,food:35,minerals:60,tech:25},baseRel:45},
+];
+
+const WEAPONS_CATALOG = [
+  {id:'rifles',name:'Assault Rifles',unit:'1,000 units',cost:2,infStrength:5,maint:0,desc:'Equip 1,000 infantry soldiers'},
+  {id:'apcs',name:'Armored APCs',unit:'10 vehicles',cost:8,armStrength:8,maint:0.1,desc:'Light armored transport, +8 armor strength'},
+  {id:'tanks',name:'Main Battle Tanks',unit:'5 tanks',cost:22,armStrength:15,maint:0.3,desc:'Heavy armor, +15 armor strength'},
+  {id:'jets',name:'Fighter Jets',unit:'3 aircraft',cost:48,airStrength:20,maint:0.8,desc:'Air superiority, +20 air strength'},
+  {id:'drones',name:'Combat Drones',unit:'10 drones',cost:14,airStrength:8,maint:0.15,desc:'Surveillance + strike, +8 air strength'},
+  {id:'ships',name:'Naval Destroyer',unit:'1 vessel',cost:85,navStrength:25,maint:1.2,desc:'Sea power projection, +25 naval strength'},
+  {id:'missiles',name:'Cruise Missiles',unit:'5 missiles',cost:32,armStrength:0,maint:0,desc:'Strategic strike weapon, one-time use'},
+];
+
+const LOAN_SOURCES = [
+  {id:'imf',name:'IMF',rate:3.5,max:60,term:[24,36,48],conditions:'Requires economic reform commitment'},
+  {id:'worldbank',name:'World Bank',rate:2.8,max:100,term:[36,48,60],conditions:'Infrastructure projects only'},
+  {id:'china',name:'China EXIM Bank',rate:4.5,max:300,term:[60,120,180],conditions:'Sovereign assets as collateral'},
+  {id:'bonds',name:'International Bonds',rate:7.5,max:150,term:[12,24,36],conditions:'No conditions, high interest rate'},
+];
+
+const DOMESTIC_STATES = ['North East','North West','North Central','South West','South East','South South'];
+
+const RESOURCE_NAMES = {oil:'Oil',food:'Food',minerals:'Minerals',tech:'Tech Goods'};
+const RESOURCE_ICONS = {oil:'🛢️',food:'🌾',minerals:'⛏️',tech:'💻'};
+
+const FALLBACK_EVENTS = [
+  {type:'warn',head:'Militant Attack on Oil Infrastructure',body:'Armed militants attacked three oil pipelines in the Niger Delta, reducing production by 25% for this month.',fx:{treasury:-8,stability:-3,approval:-2,security:-4}},
+  {type:'crit',head:'Opposition Calls for National Strike',body:'Opposition parties have called a 72-hour national strike over rising food prices. Economic activity grinds to a halt.',fx:{treasury:-12,approval:-6,stability:-5}},
+  {type:'good',head:'IMF Upgrades Growth Forecast',body:'The IMF upgraded the country growth forecast to 4.2% for the year, citing improved fiscal management.',fx:{treasury:5,economy:3,approval:3,foreignRel:2}},
+  {type:'info',head:'Neighbouring Country Requests Military Training',body:'A neighbouring state has formally requested joint military training exercises, which could strengthen regional ties.',fx:{military:2,foreignRel:3}},
+  {type:'warn',head:'Floods Devastate Agricultural Region',body:'Severe flooding has destroyed an estimated 30% of the current crop harvest, triggering food price inflation.',fx:{treasury:-6,foodSec:-8,approval:-4,stability:-2}},
+  {type:'crit',head:'Terrorist Group Claims New Territory',body:'A militant group seized two villages in the north-east, displacing 40,000 civilians. Army requesting emergency authorization.',fx:{stability:-6,security:-5,approval:-5}},
+  {type:'good',head:'Major Oil Discovery Confirmed',body:'Geologists confirm a new 2.5 billion barrel offshore oil reserve. Stock markets surge on the announcement.',fx:{treasury:15,economy:6,approval:5}},
+  {type:'info',head:'Trade Delegation Arrives from Southeast Asia',body:'A high-level trade delegation arrived seeking investment opportunities. Potential for new technology partnerships.',fx:{economy:2,foreignRel:3,tech:5}},
+  {type:'warn',head:'Power Grid Crisis — 18-Hour Outages',body:'The national grid collapsed for the third time this quarter. Industries are running on expensive diesel generators.',fx:{treasury:-7,economy:-4,approval:-6}},
+  {type:'crit',head:'Kidnapping Ring Targeting Foreign Workers',body:'A criminal network has kidnapped 12 foreign workers. International corporations are threatening to withdraw operations.',fx:{treasury:-5,foreignRel:-6,stability:-4,approval:-4}},
+  {type:'good',head:'Youth Tech Startup Achieves Unicorn Status',body:'A locally-founded tech startup became the country first unicorn, attracting global VC attention.',fx:{economy:4,tech:8,approval:6,foreignRel:4}},
+  {type:'warn',head:'Currency Faces Speculative Attack',body:'Hedge funds are shorting the national currency. The central bank is burning reserves to defend the exchange rate.',fx:{treasury:-14,economy:-5,stability:-3}},
+];
+
+// ═══════════════════════════════════════════════════
+// GAME STATE
+// ═══════════════════════════════════════════════════
+let G = {};
+let isDev = false;
+let aiThinking = false;
+
+function rn(n){ return Math.floor(Math.random()*n); }
+function rng(lo,hi){ return lo + Math.floor(Math.random()*(hi-lo+1)); }
+function cl(v,lo=0,hi=100){ return Math.min(hi,Math.max(lo,v)); }
+
+function newGame(name, country, diff){
+  const m = diff==='brutal'?0.72 : diff==='hard'?0.85 : 1;
+  const nations = NATIONS_DATA.map(n => ({
+    ...n,
+    rel: cl(n.baseRel + rng(-15,15)),
+    atWar: false,
+    isAlly: false,
+  }));
+  return {
+    name, country, diff,
+    year:2025, month:0,
+    stats:{
+      approval: cl(Math.round(62*m+rn(12))),
+      stability: cl(Math.round(55*m+rn(10))),
+      economy: cl(Math.round(50*m+rn(10))),
+      military: cl(Math.round(48*m+rn(10))),
+      healthcare: cl(Math.round(42*m+rn(8))),
+      education: cl(Math.round(40*m+rn(8))),
+      security: cl(Math.round(45*m+rn(10))),
+      foodSec: cl(Math.round(50*m+rn(10))),
+    },
+    treasury: diff==='brutal'?80 : diff==='hard'?150 : 280,
+    income: diff==='brutal'?35 : diff==='hard'?55 : 85,
+    expenses: diff==='brutal'?42 : diff==='hard'?58 : 72,
+    military:{
+      infantry: rng(30000,60000),
+      armor: rng(100,300),
+      airforce: rng(20,60),
+      navy: rng(5,20),
+      infStrength: rng(40,70),
+      armStrength: rng(20,50),
+      airStrength: rng(15,45),
+      navStrength: rng(10,30),
+      salary: diff==='brutal'?18 : diff==='hard'?14 : 12,
+    },
+    weapons:{
+      rifles: rng(20,60),
+      apcs: rng(5,20),
+      tanks: rng(2,10),
+      jets: rng(5,20),
+      drones: rng(5,15),
+      ships: rng(1,8),
+      missiles: rng(0,5),
+    },
+    resources:{
+      oil:{stock:rng(100,300),production:rng(40,80),price:rng(12,18)},
+      food:{stock:rng(50,150),production:rng(30,60),price:rng(4,7)},
+      minerals:{stock:rng(30,100),production:rng(15,35),price:rng(6,12)},
+      tech:{stock:rng(10,40),production:rng(8,18),price:rng(15,25)},
+    },
+    nations,
+    deployments:[],
+    deals:[],
+    loans:[],
+    news:[],
+    actionLog:[],
+    nextDepId:1,
+    nextDealId:1,
+    nextLoanId:1,
+  };
+}
+
+function save(){ try{ localStorage.setItem('cic_v1',JSON.stringify(G)); }catch(e){} }
+function load(){ try{ const s=localStorage.getItem('cic_v1'); return s?JSON.parse(s):null; }catch(e){ return null; } }
+
+// ═══════════════════════════════════════════════════
+// AI ENGINE
+// ═══════════════════════════════════════════════════
+async function callAI(prompt, sysPrompt){
+  try{
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:800,
+        system: sysPrompt || 'You are a geopolitical AI engine for a presidential strategy game. Respond with valid JSON only. No markdown, no backticks, no explanation outside the JSON.',
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data = await res.json();
+    const txt = data.content[0].text.replace(/```json|```/g,'').trim();
+    return JSON.parse(txt);
+  }catch(e){
+    return null;
+  }
+}
+
+async function generateWorldEvent(){
+  const state = {
+    month: MONTHS[G.month] + ' ' + G.year,
+    country: G.country,
+    approval: G.stats.approval,
+    stability: G.stats.stability,
+    economy: G.stats.economy,
+    security: G.stats.security,
+    treasury: Math.round(G.treasury),
+    activeWars: G.nations.filter(n=>n.atWar).map(n=>n.name),
+    allies: G.nations.filter(n=>n.isAlly).map(n=>n.name),
+    deployments: G.deployments.length,
+  };
+  const prompt = `Current state of ${state.country}: ${JSON.stringify(state)}
+Generate ONE realistic geopolitical or domestic event for this month. Make it unpredictable — consider the current stats, wars, and alliances.
+Respond with JSON: {"type":"warn|crit|good|info","head":"Short headline under 10 words","body":"2-3 sentence description of what happened.","fx":{"treasury":0,"approval":0,"stability":0,"economy":0,"security":0,"military":0,"foodSec":0},"involvedNation":null}
+Keep fx values between -15 and +12. Make the event feel real and consequential.`;
+  const result = await callAI(prompt);
+  if(result && result.head && result.body) return result;
+  return FALLBACK_EVENTS[rn(FALLBACK_EVENTS.length)];
+}
+
+async function getDiplomaticResponse(nationId, proposal){
+  const nation = G.nations.find(n=>n.id===nationId);
+  if(!nation) return null;
+  const prompt = `You are ${nation.name} in a geopolitical strategy game. Your relationship with ${G.country} is ${nation.rel}/100.
+${G.country} is proposing: "${proposal}"
+Respond as ${nation.name}. Consider your interests, relationship score, and geopolitical situation.
+Respond with JSON: {"accepted":true/false,"response":"1-2 sentences in character as the nation's response","counter":null,"relChange":0}
+relChange: -10 to +15 depending on how this affects relations. counter: null or a string counter-proposal if partially interested.`;
+  const result = await callAI(prompt);
+  return result;
+}
+
+// ═══════════════════════════════════════════════════
+// GAME LOGIC
+// ═══════════════════════════════════════════════════
+function applyFx(fx){
+  if(!fx) return;
+  if(fx.treasury) G.treasury = Math.max(-500, G.treasury + fx.treasury);
+  const statMap = {approval:'approval',stability:'stability',economy:'economy',military:'military',healthcare:'healthcare',education:'education',security:'security',foodSec:'foodSec'};
+  Object.keys(statMap).forEach(k=>{
+    if(fx[k] !== undefined) G.stats[k] = cl(G.stats[k] + fx[k]);
+  });
+}
+
+async function endMonth(){
+  if(aiThinking) return;
+  const btn = document.getElementById('endMonthBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ PROCESSING...';
+  aiThinking = true;
+
+  // Advance time
+  G.month = (G.month + 1) % 12;
+  if(G.month === 0) G.year++;
+
+  // Economic tick
+  const net = G.income - G.expenses - G.military.salary;
+  G.treasury += net;
+
+  // Resource income
+  let resIncome = 0;
+  ['oil','food','minerals','tech'].forEach(r=>{
+    const res = G.resources[r];
+    res.stock += res.production;
+    if(res.stock > 500) {
+      const sold = res.stock - 500;
+      resIncome += sold * res.price / 100;
+      res.stock = 500;
+    }
+    res.price = cl(res.price + rng(-2,2), 1, 99);
+  });
+  G.treasury += resIncome;
+
+  // Loan payments
+  G.loans.forEach(loan=>{
+    if(loan.remaining > 0){
+      G.treasury -= loan.monthly;
+      loan.remaining--;
+      if(loan.remaining === 0) addNews('info','Loan Repaid',`You successfully repaid your ${loan.from} loan of ₦${loan.amount}B.`,{});
+    }
+  });
+  G.loans = G.loans.filter(l=>l.remaining>0);
+
+  // Deal benefits
+  G.deals.forEach(deal=>{
+    if(deal.status === 'active'){
+      deal.duration--;
+      if(deal.ourGive && deal.ourGive.resource && deal.ourGive.amount){
+        G.resources[deal.ourGive.resource].stock -= deal.ourGive.amount;
+        G.treasury -= deal.ourGive.cost || 0;
+      }
+      if(deal.theirGive && deal.theirGive.resource && deal.theirGive.amount){
+        G.resources[deal.theirGive.resource].stock = Math.min(500, (G.resources[deal.theirGive.resource].stock||0) + deal.theirGive.amount);
+      }
+      if(deal.duration <= 0){
+        deal.status = 'expired';
+        addNews('info','Deal Expired',`Your deal with ${deal.with} has expired.`,{});
+      }
+    }
+  });
+  G.deals = G.deals.filter(d=>d.status==='active');
+
+  // Passive stat drift
+  const qol = (G.stats.economy+G.stats.healthcare+G.stats.foodSec+G.stats.security)/4;
+  G.stats.approval = cl(G.stats.approval + (qol>55?1:qol<40?-1:0));
+  if(G.diff==='hard'){G.stats.approval=cl(G.stats.approval-1);G.stats.stability=cl(G.stats.stability-1);}
+  if(G.diff==='brutal'){G.stats.approval=cl(G.stats.approval-2);G.stats.stability=cl(G.stats.stability-2);G.treasury-=5;}
+
+  // Small random drift on all stats
+  Object.keys(G.stats).forEach(k=>{
+    if(k==='approval') return;
+    const r = Math.random();
+    if(r>.82) G.stats[k]=cl(G.stats[k]+1);
+    else if(r<.18) G.stats[k]=cl(G.stats[k]-1);
+  });
+
+  // Generate AI world event
+  const event = await generateWorldEvent();
+  if(event){
+    applyFx(event.fx);
+    addNews(event.type, event.head, event.body, event.fx, event.involvedNation);
+  }
+
+  aiThinking = false;
+  btn.disabled = false;
+  btn.textContent = '⏭ END MONTH';
+  save();
+  renderAll();
+  switchTab('Intel');
+}
+
+function addNews(type, head, body, fx, nation){
+  const fxStr = Object.entries(fx||{}).filter(([k,v])=>v!==0&&k!=='treasury').map(([k,v])=>`${k}:${v>0?'+'+v:v}`).join(' ');
+  const tStr = fx && fx.treasury ? (fx.treasury>0?`💰+₦${fx.treasury}B`:`💸₦${Math.abs(fx.treasury)}B`) : '';
+  G.news.unshift({type,head,body,fx:fxStr,treasury:tStr,date:MONTHS[G.month]+' '+G.year,nation:nation||null});
+  if(G.news.length>50) G.news.pop();
+}
+
+function logAction(text){
+  G.actionLog.unshift({text,date:MONTHS[G.month]+' '+G.year});
+  if(G.actionLog.length>30) G.actionLog.pop();
+}
+
+// RECRUIT TROOPS
+function recruitTroops(type, amount, cost){
+  if(G.treasury < cost){ alert('Insufficient treasury funds.'); return; }
+  G.treasury -= cost;
+  G.military[type] += amount;
+  if(type==='infantry') G.military.salary += amount*0.00002;
+  else if(type==='armor') G.military.salary += 0.3;
+  else if(type==='airforce') G.military.salary += 0.8;
+  else if(type==='navy') G.military.salary += 1.2;
+  G.stats.military = cl(G.stats.military + Math.floor(amount/5000+1));
+  logAction(`Recruited ${amount.toLocaleString()} ${type} troops (₦${cost}B)`);
+  save(); renderAll(); closeModalDirect();
+  addNews('info','New Recruits Enlisted',`${amount.toLocaleString()} new ${type} personnel have been added to the armed forces.`,{military:2});
+}
+
+// BUY WEAPON
+function buyWeapon(id, qty){
+  const w = WEAPONS_CATALOG.find(x=>x.id===id);
+  if(!w) return;
+  const totalCost = w.cost * qty;
+  if(G.treasury < totalCost){ alert('Insufficient treasury funds.'); return; }
+  G.treasury -= totalCost;
+  G.weapons[id] = (G.weapons[id]||0) + qty;
+  if(w.infStrength) G.military.infStrength = cl(G.military.infStrength + w.infStrength*qty);
+  if(w.armStrength) G.military.armStrength = cl(G.military.armStrength + w.armStrength*qty);
+  if(w.airStrength) G.military.airStrength = cl(G.military.airStrength + w.airStrength*qty);
+  if(w.navStrength) G.military.navStrength = cl(G.military.navStrength + w.navStrength*qty);
+  G.military.salary += w.maint * qty;
+  G.stats.military = cl(G.stats.military + qty);
+  logAction(`Purchased ${qty}x ${w.name} (₦${totalCost}B)`);
+  save(); renderAll(); closeModalDirect();
+}
+
+// DEPLOY TROOPS
+function deployTroops(toId, toName, type, amount, purpose, condResource, condAmount, condDuration){
+  const units = type==='infantry'?G.military.infantry:type==='armor'?G.military.armor:type==='airforce'?G.military.airforce:G.military.navy;
+  if(units < amount){ alert('You do not have enough units of that type.'); return; }
+  const dep = {
+    id: G.nextDepId++,
+    to: toId, toName, type, amount, purpose,
+    since: MONTHS[G.month]+' '+G.year,
+    status:'active',
+    conditions:{ resource: condResource||null, amount: condAmount||0, duration: condDuration||0, elapsed:0 }
+  };
+  if(type==='infantry') G.military.infantry -= amount;
+  else if(type==='armor') G.military.armor -= amount;
+  else if(type==='airforce') G.military.airforce -= amount;
+  else if(type==='navy') G.military.navy -= amount;
+  G.deployments.push(dep);
+  logAction(`Deployed ${amount.toLocaleString()} ${type} to ${toName} (${purpose})`);
+  save(); renderAll(); closeModalDirect();
+  addNews('info',`Troops Deployed to ${toName}`,`${amount.toLocaleString()} ${type} units deployed for ${purpose} operations.`,{military:-1,security:2});
+}
+
+// RECALL TROOPS
+function recallTroops(depId){
+  const dep = G.deployments.find(d=>d.id===depId);
+  if(!dep) return;
+  dep.status = 'recalled';
+  if(dep.type==='infantry') G.military.infantry += dep.amount;
+  else if(dep.type==='armor') G.military.armor += dep.amount;
+  else if(dep.type==='airforce') G.military.airforce += dep.amount;
+  else if(dep.type==='navy') G.military.navy += dep.amount;
+  G.deployments = G.deployments.filter(d=>d.id!==depId);
+  logAction(`Recalled ${dep.amount.toLocaleString()} ${dep.type} from ${dep.toName}`);
+  save(); renderAll();
+  addNews('info','Troops Recalled',`Forces withdrawn from ${dep.toName} and returned to base.`,{});
+}
+
+// DECLARE WAR
+async function declareWar(nationId){
+  const nation = G.nations.find(n=>n.id===nationId);
+  if(!nation) return;
+  if(!confirm(`Declare war on ${nation.name}? This is irreversible and will have serious consequences.`)) return;
+  nation.atWar = true;
+  nation.isAlly = false;
+  nation.rel = 0;
+  // Nearby nations react
+  G.nations.forEach(n=>{
+    if(n.id!==nationId && n.isAlly) n.rel = cl(n.rel - 15);
+  });
+  G.stats.stability = cl(G.stats.stability - 10);
+  G.stats.security = cl(G.stats.security - 5);
+  G.stats.approval = cl(G.stats.approval - 8);
+  logAction(`Declared war on ${nation.name}`);
+  save(); renderAll(); closeModalDirect();
+  addNews('crit',`War Declared on ${nation.name}`,`${G.country} has officially declared war. The international community responds with alarm.`,{stability:-10,approval:-8,foreignRel:-5});
+}
+
+// MAKE PEACE
+async function makePeace(nationId){
+  const nation = G.nations.find(n=>n.id===nationId);
+  if(!nation||!nation.atWar) return;
+  nation.atWar = false;
+  nation.rel = cl(nation.rel + 20);
+  G.stats.stability = cl(G.stats.stability + 6);
+  logAction(`Made peace with ${nation.name}`);
+  save(); renderAll(); closeModalDirect();
+  addNews('good',`Peace Agreement with ${nation.name}`,`A peace accord has been signed, ending hostilities between both nations.`,{stability:6,approval:4});
+}
+
+// FORM ALLIANCE
+async function formAlliance(nationId){
+  const nation = G.nations.find(n=>n.id===nationId);
+  if(!nation) return;
+  if(nation.rel < 40){ alert(`Relations with ${nation.name} are too low (${nation.rel}/100). Improve relations first by offering aid or trade deals.`); return; }
+  const btn = document.getElementById('btnAlliance_'+nationId);
+  if(btn){ btn.disabled=true; btn.textContent='⏳ NEGOTIATING...'; }
+
+  const proposal = `A formal mutual defense alliance. We agree to defend each other against external aggression, share military intelligence, and allow troop movement through each other's territory.`;
+  const response = await getDiplomaticResponse(nationId, proposal);
+
+  if(btn){ btn.disabled=false; btn.textContent='🤝 Form Alliance'; }
+
+  let msg = '';
+  if(response){
+    if(response.accepted){
+      nation.isAlly = true;
+      nation.rel = cl(nation.rel + (response.relChange||10));
+      G.stats.military = cl(G.stats.military + 3);
+      logAction(`Formed alliance with ${nation.name}`);
+      msg = response.response;
+      addNews('good',`Alliance Formed with ${nation.name}`,response.response,{military:3,stability:4,approval:2});
+    } else {
+      nation.rel = cl(nation.rel + (response.relChange||0));
+      msg = response.response + (response.counter ? '\n\nCounter: '+response.counter : '');
+    }
+    save(); renderAll();
+    showInfoModal(response.accepted?'✅ Alliance Formed':'❌ Alliance Rejected', msg);
+  }
+}
+
+// TAKE LOAN
+function takeLoan(sourceId, amount, months){
+  const src = LOAN_SOURCES.find(s=>s.id===sourceId);
+  if(!src) return;
+  if(amount > src.max){ alert(`Maximum loan from ${src.name} is ₦${src.max}B.`); return; }
+  const interest = src.rate/100/12;
+  const monthly = (amount * interest * Math.pow(1+interest,months)) / (Math.pow(1+interest,months)-1);
+  G.treasury += amount;
+  G.loans.push({id:G.nextLoanId++, from:src.name, amount, months, remaining:months, monthly:parseFloat(monthly.toFixed(2)), rate:src.rate});
+  G.expenses += monthly;
+  logAction(`Took ₦${amount}B loan from ${src.name} at ${src.rate}% for ${months} months`);
+  save(); renderAll(); closeModalDirect();
+  addNews('info',`₦${amount}B Loan Secured from ${src.name}`,`Funds disbursed. Monthly repayment of ₦${monthly.toFixed(1)}B for ${months} months.`,{treasury:amount});
+}
+
+// SELL RESOURCE
+function sellResource(resource, amount){
+  const res = G.resources[resource];
+  if(res.stock < amount){ alert('Insufficient stock to sell.'); return; }
+  const revenue = amount * res.price / 100 * 10;
+  res.stock -= amount;
+  G.treasury += revenue;
+  logAction(`Sold ${amount} units of ${RESOURCE_NAMES[resource]} for ₦${revenue.toFixed(1)}B`);
+  save(); renderAll(); closeModalDirect();
+}
+
+// PROPOSE TRADE DEAL
+async function proposeDeal(nationId, ourResource, ourAmount, theirResource, theirAmount, months){
+  const nation = G.nations.find(n=>n.id===nationId);
+  if(!nation) return;
+  const proposal = `A resource trade agreement: We provide ${ourAmount} units of ${ourResource} per month in exchange for ${theirAmount} units of ${theirResource} per month, for ${months} months.`;
+  const response = await getDiplomaticResponse(nationId, proposal);
+  if(response && response.accepted){
+    nation.rel = cl(nation.rel + (response.relChange||5));
+    const deal = {
+      id: G.nextDealId++,
+      with: nation.name,
+      withId: nationId,
+      ourGive:{resource:ourResource,amount:ourAmount},
+      theirGive:{resource:theirResource,amount:theirAmount},
+      duration: months,
+      status:'active',
+      since: MONTHS[G.month]+' '+G.year
+    };
+    G.deals.push(deal);
+    logAction(`Trade deal with ${nation.name}: give ${ourAmount} ${ourResource}/mo, receive ${theirAmount} ${theirResource}/mo`);
+    save(); renderAll(); closeModalDirect();
+    addNews('good',`Trade Deal with ${nation.name}`,response.response,{economy:2,foreignRel:3});
+    showInfoModal('✅ Deal Accepted', response.response);
+  } else if(response){
+    nation.rel = cl(nation.rel + (response.relChange||0));
+    save(); renderAll();
+    showInfoModal('❌ Deal Rejected', response.response + (response.counter?'\n\nCounter: '+response.counter:''));
+  }
+}
+
+// SEND AID
+async function sendAid(nationId, amount){
+  if(G.treasury < amount){ alert('Insufficient funds.'); return; }
+  const nation = G.nations.find(n=>n.id===nationId);
+  if(!nation) return;
+  G.treasury -= amount;
+  nation.rel = cl(nation.rel + Math.floor(amount/5));
+  logAction(`Sent ₦${amount}B aid to ${nation.name}`);
+  save(); renderAll(); closeModalDirect();
+  addNews('good',`Aid Sent to ${nation.name}`,`₦${amount}B in humanitarian and economic aid dispatched, strengthening bilateral relations.`,{foreignRel:4,approval:2,treasury:-amount});
+}
+
+// BUY WEAPONS FOR ALLY
+async function sendWeapons(nationId, weaponId, qty){
+  const w = WEAPONS_CATALOG.find(x=>x.id===weaponId);
+  if(!w) return;
+  const cost = w.cost * qty * 0.8;
+  if(G.treasury < cost){ alert('Insufficient funds.'); return; }
+  const nation = G.nations.find(n=>n.id===nationId);
+  if(!nation) return;
+  G.treasury -= cost;
+  nation.rel = cl(nation.rel + 8);
+  logAction(`Sent ${qty}x ${w.name} to ${nation.name} (₦${cost.toFixed(0)}B)`);
+  save(); renderAll(); closeModalDirect();
+  addNews('good',`Weapons Delivered to ${nation.name}`,`Military hardware transfer strengthens our strategic partnership.`,{foreignRel:6,military:1});
+}
+
+// ═══════════════════════════════════════════════════
+// UI RENDER
+// ═══════════════════════════════════════════════════
+function vc(v){ return v>=70?'vg':v>=50?'vo':v>=30?'vw':v>=12?'vb':'vc'; }
+function fc(v){ return v>=70?'#18a86a':v>=50?'#1a8a5a':v>=30?'#d4a017':v>=12?'#c84040':'#ff2020'; }
+
+function renderTopbar(){
+  document.getElementById('tbName').textContent = (isDev?'👨‍💻 ':'')+G.name;
+  document.getElementById('tbCtry').textContent = '🏛️ '+G.country;
+  document.getElementById('tbDate').textContent = MONTHS[G.month]+' '+G.year;
+  document.getElementById('tbTurn').textContent = 'MONTH '+(((G.year-2025)*12)+G.month+1);
+  const t = G.treasury;
+  document.getElementById('tbTreasury').textContent = '₦'+(Math.abs(t)>=1000?((t/1000).toFixed(1)+'T'):t.toFixed(0)+'B');
+  document.getElementById('tbTreasury').style.color = t>=0?'var(--gold)':'var(--red)';
+  const ap = G.stats.approval;
+  document.getElementById('tbApproval').textContent = ap+'%';
+  document.getElementById('tbApproval').style.color = ap>=60?'var(--grn)':ap>=40?'#d4a017':'var(--red)';
+}
+
+function renderOverview(){
+  document.getElementById('ovMonth').textContent = MONTHS[G.month]+' '+G.year;
+
+  // Stat bars
+  const stats = [
+    {k:'approval',l:'Approval',ic:'👥'},
+    {k:'stability',l:'Stability',ic:'⚖️'},
+    {k:'economy',l:'Economy',ic:'📈'},
+    {k:'security',l:'Security',ic:'🛡️'},
+    {k:'healthcare',l:'Healthcare',ic:'❤️'},
+    {k:'education',l:'Education',ic:'🎓'},
+    {k:'foodSec',l:'Food Sec.',ic:'🌾'},
+    {k:'military',l:'Military',ic:'⚔️'},
+  ];
+  document.getElementById('ovStats').innerHTML = stats.map(s=>{
+    const v = G.stats[s.k];
+    return `<div class="sbar-row"><span class="sbar-lbl">${s.ic} ${s.l}</span><div class="sbar-track"><div class="sbar-fill" style="width:${v}%;background:${fc(v)}"></div></div><span class="sbar-val ${vc(v)}">${v}</span></div>`;
+  }).join('');
+
+  // Military overview
+  const mil = G.military;
+  document.getElementById('ovMil').innerHTML = `
+    <div class="grid2">
+      <div class="statbox"><div class="sbl">INFANTRY</div><div class="sbv t-gold">${mil.infantry.toLocaleString()}</div></div>
+      <div class="statbox"><div class="sbl">ARMOR</div><div class="sbv t-gold">${mil.armor.toLocaleString()}</div></div>
+      <div class="statbox"><div class="sbl">AIR FORCE</div><div class="sbv t-gold">${mil.airforce.toLocaleString()}</div></div>
+      <div class="statbox"><div class="sbl">NAVY</div><div class="sbv t-gold">${mil.navy.toLocaleString()}</div></div>
+    </div>
+    <div style="margin-top:.6rem;display:flex;gap:.5rem;flex-wrap:wrap">
+      <span style="font-size:.7rem;color:var(--dim)">Monthly salary: <span style="color:var(--red)">-₦${mil.salary.toFixed(1)}B</span></span>
+      <span style="font-size:.7rem;color:var(--dim)">Net/month: <span style="color:${(G.income-G.expenses-G.military.salary)>=0?'var(--grn)':'var(--red)'}">₦${(G.income-G.expenses-G.military.salary).toFixed(1)}B</span></span>
+    </div>`;
+
+  // Active deployments
+  const deps = G.deployments.filter(d=>d.status==='active');
+  document.getElementById('depCount').textContent = deps.length ? '('+deps.length+')' : '';
+  document.getElementById('ovDeps').innerHTML = deps.length ? deps.map(d=>`
+    <div class="dep-card">
+      <div class="dep-hdr"><span class="dep-loc">📍 ${d.toName}</span><button class="btn btn-red btn-sm" onclick="recallTroops(${d.id})">RECALL</button></div>
+      <div class="dep-info">${d.amount.toLocaleString()} ${d.type} · ${d.purpose} · Since ${d.since}</div>
+    </div>`).join('') : '<div style="color:var(--dim);font-size:.75rem">No active deployments.</div>';
+
+  // Active deals
+  const deals = G.deals.filter(d=>d.status==='active');
+  document.getElementById('dealCount').textContent = deals.length ? '('+deals.length+')' : '';
+  document.getElementById('ovDeals').innerHTML = deals.length ? deals.map(d=>`
+    <div class="dep-card">
+      <div class="dep-hdr"><span class="dep-loc">🤝 ${d.with}</span><span style="font-size:.65rem;color:var(--dim)">${d.duration} months left</span></div>
+      <div class="dep-info">Give: ${d.ourGive.amount} ${d.ourGive.resource}/mo → Receive: ${d.theirGive.amount} ${d.theirGive.resource}/mo</div>
+    </div>`).join('') : '<div style="color:var(--dim);font-size:.75rem">No active deals.</div>';
+
+  // Dev panel
+  if(isDev) renderDevPanel();
+}
+
+function renderDevPanel(){
+  const dp = document.getElementById('devPanel');
+  dp.style.display = 'block';
+  const statKeys = Object.keys(G.stats);
+  dp.innerHTML = `<div class="devpanel">
+    <div class="dp-title">🔧 DEVELOPER MODE — EDIT ANY STAT</div>
+    <div class="dev-grid">${statKeys.map(k=>`<div class="dev-item"><label>${k.toUpperCase()}</label><input type="number" min="0" max="100" value="${G.stats[k]}" onchange="G.stats['${k}']=cl(parseInt(this.value)||0);renderAll()"/></div>`).join('')}
+    <div class="dev-item"><label>TREASURY (₦B)</label><input type="number" value="${Math.round(G.treasury)}" onchange="G.treasury=parseFloat(this.value)||0;renderAll()"/></div>
+    <div class="dev-item"><label>INFANTRY</label><input type="number" value="${G.military.infantry}" onchange="G.military.infantry=parseInt(this.value)||0;renderAll()"/></div>
+    <div class="dev-item"><label>ARMOR</label><input type="number" value="${G.military.armor}" onchange="G.military.armor=parseInt(this.value)||0;renderAll()"/></div>
+    </div>
+    <button class="btn btn-gold btn-sm" style="margin-top:.5rem" onclick="save();alert('Saved!')">💾 SAVE CHANGES</button>
+  </div>`;
+}
+
+function renderMilitary(){
+  const mil = G.military;
+  document.getElementById('milForces').innerHTML = `
+    <div class="grid2">
+      <div class="statbox"><div class="sbl">INFANTRY</div><div class="sbv t-gold">${mil.infantry.toLocaleString()}</div></div>
+      <div class="statbox"><div class="sbl">ARMOR</div><div class="sbv t-gold">${mil.armor}</div></div>
+      <div class="statbox"><div class="sbl">AIR FORCE</div><div class="sbv t-gold">${mil.airforce}</div></div>
+      <div class="statbox"><div class="sbl">NAVY</div><div class="sbv t-gold">${mil.navy}</div></div>
+    </div>
+    <div style="margin-top:.65rem">
+      <div class="sbar-row"><span class="sbar-lbl">🔫 Inf. Str.</span><div class="sbar-track"><div class="sbar-fill" style="width:${mil.infStrength}%;background:${fc(mil.infStrength)}"></div></div><span class="sbar-val ${vc(mil.infStrength)}">${mil.infStrength}</span></div>
+      <div class="sbar-row"><span class="sbar-lbl">🚗 Arm. Str.</span><div class="sbar-track"><div class="sbar-fill" style="width:${Math.min(100,mil.armStrength)}%;background:${fc(Math.min(100,mil.armStrength))}"></div></div><span class="sbar-val">${mil.armStrength}</span></div>
+      <div class="sbar-row"><span class="sbar-lbl">✈️ Air Str.</span><div class="sbar-track"><div class="sbar-fill" style="width:${Math.min(100,mil.airStrength)}%;background:${fc(Math.min(100,mil.airStrength))}"></div></div><span class="sbar-val">${mil.airStrength}</span></div>
+      <div class="sbar-row"><span class="sbar-lbl">🚢 Nav. Str.</span><div class="sbar-track"><div class="sbar-fill" style="width:${Math.min(100,mil.navStrength)}%;background:${fc(Math.min(100,mil.navStrength))}"></div></div><span class="sbar-val">${mil.navStrength}</span></div>
+    </div>`;
+
+  // Deployments
+  const deps = G.deployments.filter(d=>d.status==='active');
+  document.getElementById('milDeps').innerHTML = deps.length ? deps.map(d=>`
+    <div class="dep-card">
+      <div class="dep-hdr"><span class="dep-loc">📍 ${d.toName}</span><button class="btn btn-red btn-sm" onclick="recallTroops(${d.id})">✈️ RECALL</button></div>
+      <div class="dep-info">${d.amount.toLocaleString()} ${d.type} · <strong style="color:var(--gold)">${d.purpose}</strong> · Since ${d.since}</div>
+      ${d.conditions.resource?`<div style="font-size:.65rem;color:var(--cyn)">📋 Condition: Receive ${d.conditions.amount} ${d.conditions.resource}/month</div>`:''}
+    </div>`).join('') : '<div style="color:var(--dim);font-size:.75rem">No active deployments.</div>';
+
+  // Weapons
+  const wKeys = Object.keys(G.weapons).filter(k=>G.weapons[k]>0);
+  document.getElementById('milWeapons').innerHTML = wKeys.length ? `<div class="grid3">${wKeys.map(k=>{
+    const cat = WEAPONS_CATALOG.find(w=>w.id===k);
+    return `<div class="statbox"><div class="sbl">${(cat?cat.name:k).toUpperCase()}</div><div class="sbv t-gold">${G.weapons[k]}</div></div>`;
+  }).join('')}</div>` : '<div style="color:var(--dim);font-size:.75rem">No weapons inventory recorded.</div>';
+}
+
+function renderEconomy(){
+  const net = G.income - G.expenses - G.military.salary;
+  document.getElementById('ecoSummary').innerHTML = `
+    <div class="grid2">
+      <div class="statbox"><div class="sbl">TREASURY</div><div class="sbv" style="color:${G.treasury>=0?'var(--gold)':'var(--red)'}">₦${G.treasury.toFixed(0)}B</div></div>
+      <div class="statbox"><div class="sbl">NET/MONTH</div><div class="sbv" style="color:${net>=0?'var(--grn)':'var(--red)'}">₦${net.toFixed(1)}B</div></div>
+      <div class="statbox"><div class="sbl">INCOME</div><div class="sbv t-green">+₦${G.income.toFixed(0)}B</div></div>
+      <div class="statbox"><div class="sbl">EXPENSES</div><div class="sbv t-red">-₦${(G.expenses+G.military.salary).toFixed(1)}B</div></div>
+    </div>
+    <div style="margin-top:.6rem;display:flex;gap:.4rem;flex-wrap:wrap">
+      <button class="btn btn-outline btn-sm" onclick="showSellModal()">💰 SELL RESOURCES</button>
+    </div>`;
+
+  // Resources
+  document.getElementById('ecoResources').innerHTML = Object.entries(G.resources).map(([k,r])=>`
+    <div class="res-row">
+      <div>
+        <div class="res-name">${RESOURCE_ICONS[k]} ${RESOURCE_NAMES[k]}</div>
+        <div class="res-stats">Stock: ${r.stock} · Prod: +${r.production}/mo · Price: ₦${r.price}B/10u</div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="showSellModal('${k}')">SELL</button>
+    </div>`).join('');
+
+  // Loans
+  document.getElementById('loanCount').textContent = G.loans.length ? '('+G.loans.length+' active)' : '(none)';
+  document.getElementById('ecoLoans').innerHTML = G.loans.length ? G.loans.map(l=>`
+    <div class="loan-card">
+      <div class="loan-hdr"><span>${l.from}</span><span style="color:var(--red)">-₦${l.monthly.toFixed(1)}B/mo</span></div>
+      <div class="loan-detail">₦${l.amount}B · ${l.rate}% p.a. · ${l.remaining} months remaining</div>
+    </div>`).join('') : '<div style="color:var(--dim);font-size:.75rem;margin-bottom:.5rem">No active loans.</div>';
+}
+
+function renderDiplomacy(){
+  document.getElementById('dipNations').innerHTML = G.nations.map(n=>{
+    const relColor = n.rel>=70?'var(--grn)':n.rel>=45?'var(--gold)':n.rel>=25?'#c87820':'var(--red)';
+    const tag = n.atWar?'<span class="tag tag-war">WAR</span>':n.isAlly?'<span class="tag tag-ally">ALLY</span>':n.rel<20?'<span class="tag tag-enemy">HOSTILE</span>':'<span class="tag tag-neutral">NEUTRAL</span>';
+    return `<div class="ncard" onclick="showNationModal('${n.id}')">
+      <div class="nflag">${n.flag}</div>
+      <div class="ninfo">
+        <div class="nname">${n.name} ${tag}</div>
+        <div class="nstatus" style="color:var(--dim)">${n.region} · GDP: $${n.gdp}B · Mil: ${n.mil}/100</div>
+        <div class="nrel-bar"><div class="nrel-fill" style="width:${n.rel}%;background:${relColor}"></div></div>
+        <div style="font-size:.62rem;color:${relColor};margin-top:.15rem">Relations: ${n.rel}/100</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderIntel(){
+  const feed = document.getElementById('intelFeed');
+  if(!G.news.length){
+    feed.innerHTML = '<div class="card"><div style="color:var(--dim);font-size:.78rem">No intelligence reports yet. End your first month to receive updates.</div></div>';
+    return;
+  }
+  feed.innerHTML = G.news.map(n=>`
+    <div class="news-item ${n.type}">
+      <div class="news-date">${n.date}${n.nation?' · '+n.nation:''}</div>
+      <div class="news-head">${n.head}</div>
+      <div class="news-body">${n.body}</div>
+      ${(n.fx||n.treasury)?`<div class="news-fx">${n.treasury?'<span style="color:var(--gold)">'+n.treasury+'</span> ':''}<span style="color:var(--dim)">${n.fx}</span></div>`:''}
+    </div>`).join('');
+}
+
+function renderAll(){
+  renderTopbar();
+  renderOverview();
+  renderMilitary();
+  renderEconomy();
+  renderDiplomacy();
+  renderIntel();
+}
+
+// ═══════════════════════════════════════════════════
+// MODALS
+// ═══════════════════════════════════════════════════
+function openModal(title, body){
+  document.getElementById('mTitle').textContent = title;
+  document.getElementById('mBody').innerHTML = body;
+  document.getElementById('mOverlay').classList.add('open');
+}
+function closeModal(e){ if(e.target===document.getElementById('mOverlay')) closeModalDirect(); }
+function closeModalDirect(){ document.getElementById('mOverlay').classList.remove('open'); }
+function showInfoModal(title, text){
+  openModal(title, `<p style="font-size:.85rem;line-height:1.6;color:var(--txt)">${text.replace(/\n/g,'<br>')}</p><button class="btn btn-gold btn-full" onclick="closeModalDirect()" style="margin-top:1rem">OK</button>`);
+}
+
+function showNationModal(nationId){
+  const n = G.nations.find(x=>x.id===nationId);
+  if(!n) return;
+  const relColor = n.rel>=70?'var(--grn)':n.rel>=45?'var(--gold)':'var(--red)';
+  const tag = n.atWar?'<span class="tag tag-war">AT WAR</span>':n.isAlly?'<span class="tag tag-ally">ALLY</span>':n.rel<20?'<span class="tag tag-enemy">HOSTILE</span>':'<span class="tag tag-neutral">NEUTRAL</span>';
+  const res = Object.entries(n.resources).map(([k,v])=>`${RESOURCE_ICONS[k]} ${v}`).join('  ');
+  const body = `
+    <div style="text-align:center;margin-bottom:1rem">
+      <div style="font-size:3rem">${n.flag}</div>
+      <div style="font-size:1rem;font-weight:700;color:#fff;margin:.3rem 0">${n.name} ${tag}</div>
+      <div style="font-size:.72rem;color:var(--dim)">${n.region}</div>
+    </div>
+    <div class="grid2" style="margin-bottom:1rem">
+      <div class="statbox"><div class="sbl">GDP</div><div class="sbv t-gold">$${n.gdp}B</div></div>
+      <div class="statbox"><div class="sbl">MIL POWER</div><div class="sbv t-gold">${n.mil}/100</div></div>
+    </div>
+    <div style="margin-bottom:.75rem">
+      <div style="font-size:.62rem;color:var(--dim);letter-spacing:.15em;margin-bottom:.3rem">RELATIONS</div>
+      <div class="sbar-track" style="height:8px"><div class="sbar-fill" style="width:${n.rel}%;background:${relColor}"></div></div>
+      <div style="font-size:.72rem;color:${relColor};margin-top:.2rem">${n.rel}/100</div>
+    </div>
+    <div style="font-size:.7rem;color:var(--dim);margin-bottom:1rem">Resources: ${res}</div>
+    <div style="display:flex;flex-direction:column;gap:.4rem">
+      ${!n.isAlly&&!n.atWar?`<button id="btnAlliance_${n.id}" class="btn btn-green" onclick="formAlliance('${n.id}')">🤝 Propose Alliance</button>`:''}
+      ${n.isAlly?`<button class="btn btn-outline" onclick="showDealModal('${n.id}')">📦 Propose Trade Deal</button>`:''}
+      ${n.isAlly?`<button class="btn btn-blue" onclick="showSendWeaponsModal('${n.id}')">🔫 Send Weapons</button>`:''}
+      <button class="btn btn-outline" onclick="showAidModal('${n.id}')">💊 Send Aid (strengthens relations)</button>
+      ${n.isAlly?`<button class="btn btn-outline" onclick="showDeployModal('${n.id}')">✈️ Deploy Troops Here</button>`:''}
+      ${n.atWar?`<button class="btn btn-green" onclick="makePeace('${n.id}')">🕊️ Propose Peace</button>`:`<button class="btn btn-red" onclick="declareWar('${n.id}')">⚔️ Declare War</button>`}
+    </div>`;
+  openModal(n.name, body);
+}
+
+function showRecruitModal(){
+  const body = `
+    <p style="font-size:.75rem;color:var(--dim);margin-bottom:.9rem">Treasury: ₦${G.treasury.toFixed(0)}B</p>
+    <div style="display:flex;flex-direction:column;gap:.5rem">
+      <button class="btn btn-outline" onclick="recruitTroops('infantry',5000,5)">+ 5,000 Infantry — ₦5B (+₦0.5B/mo salary)</button>
+      <button class="btn btn-outline" onclick="recruitTroops('infantry',20000,18)">+ 20,000 Infantry — ₦18B (+₦1.5B/mo)</button>
+      <button class="btn btn-blue" onclick="recruitTroops('armor',50,15)">+ 50 Armored Units — ₦15B (+₦1B/mo)</button>
+      <button class="btn btn-blue" onclick="recruitTroops('airforce',10,30)">+ 10 Air Force Squadron — ₦30B (+₦2B/mo)</button>
+      <button class="btn btn-blue" onclick="recruitTroops('navy',5,40)">+ 5 Naval Fleet Units — ₦40B (+₦2.5B/mo)</button>
+    </div>`;
+  openModal('Recruit Troops', body);
+}
+
+function showBuyWeaponModal(){
+  const body = `
+    <p style="font-size:.75rem;color:var(--dim);margin-bottom:.9rem">Treasury: ₦${G.treasury.toFixed(0)}B · Select quantity then purchase</p>
+    ${WEAPONS_CATALOG.map(w=>`
+      <div style="background:var(--s2);border:1px solid var(--bdr);border-radius:6px;padding:.7rem;margin-bottom:.45rem">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.25rem">
+          <span style="font-size:.85rem;font-weight:700;color:#fff">${w.name}</span>
+          <span style="font-size:.7rem;color:var(--gold)">₦${w.cost}B/${w.unit}</span>
+        </div>
+        <div style="font-size:.7rem;color:var(--dim);margin-bottom:.4rem">${w.desc}${w.maint?` · Maint: ₦${w.maint}B/mo`:''}</div>
+        <div style="display:flex;gap:.4rem">
+          <button class="btn btn-gold btn-sm" onclick="buyWeapon('${w.id}',1)">Buy 1 — ₦${w.cost}B</button>
+          <button class="btn btn-outline btn-sm" onclick="buyWeapon('${w.id}',3)">Buy 3 — ₦${w.cost*3}B</button>
+          <button class="btn btn-outline btn-sm" onclick="buyWeapon('${w.id}',5)">Buy 5 — ₦${w.cost*5}B</button>
+        </div>
+      </div>`).join('')}`;
+  openModal('Buy Weapons', body);
+}
+
+function showDeployModal(preNationId){
+  const nations = preNationId ? G.nations.filter(n=>n.id===preNationId) : [...G.nations.filter(n=>n.isAlly), {id:'DOM', name:'Domestic — NE Region', flag:'🏠'},{id:'DOM_NW',name:'Domestic — NW Region',flag:'🏠'},{id:'DOM_SS',name:'Domestic — South South',flag:'🏠'}];
+  const body = `
+    <p style="font-size:.75rem;color:var(--dim);margin-bottom:.8rem">Select destination, unit type, amount, and purpose. You can attach resource exchange conditions.</p>
+    <div class="ig"><label>DESTINATION</label>
+      <select id="dDest">${nations.map(n=>`<option value="${n.id}|${n.name}">${n.flag||'🏠'} ${n.name}</option>`).join('')}</select></div>
+    <div class="ig"><label>UNIT TYPE</label>
+      <select id="dType"><option value="infantry">Infantry</option><option value="armor">Armored Corps</option><option value="airforce">Air Force</option><option value="navy">Navy</option></select></div>
+    <div class="ig"><label>AMOUNT</label>
+      <input id="dAmt" type="number" placeholder="e.g. 5000" min="100"/></div>
+    <div class="ig"><label>PURPOSE</label>
+      <select id="dPurp"><option>Counter-Terrorism</option><option>Peacekeeping</option><option>Invasion Support</option><option>Training Mission</option><option>Humanitarian Support</option><option>Border Security</option></select></div>
+    <div style="margin-bottom:.6rem;font-size:.7rem;color:var(--gold);letter-spacing:.1em">OPTIONAL: RESOURCE EXCHANGE CONDITION</div>
+    <div class="grid2">
+      <div class="ig"><label>RECEIVE RESOURCE</label>
+        <select id="dResType"><option value="">None</option>${Object.keys(RESOURCE_NAMES).map(k=>`<option value="${k}">${RESOURCE_NAMES[k]}</option>`).join('')}</select></div>
+      <div class="ig"><label>AMOUNT/MONTH</label><input id="dResAmt" type="number" placeholder="0" min="0"/></div>
+    </div>
+    <button class="btn btn-gold btn-full" onclick="onDeploy()">✈️ DEPLOY NOW</button>`;
+  openModal('Deploy Troops', body);
+}
+
+function onDeploy(){
+  const dest = document.getElementById('dDest').value.split('|');
+  const type = document.getElementById('dType').value;
+  const amt = parseInt(document.getElementById('dAmt').value)||0;
+  const purp = document.getElementById('dPurp').value;
+  const resType = document.getElementById('dResType').value;
+  const resAmt = parseInt(document.getElementById('dResAmt').value)||0;
+  if(!amt||amt<100){ alert('Enter a valid troop amount (min 100).'); return; }
+  deployTroops(dest[0], dest[1], type, amt, purp, resType, resAmt, 0);
+}
+
+function showLoanModal(){
+  const body = `
+    <p style="font-size:.75rem;color:var(--dim);margin-bottom:.8rem">Current loans: ${G.loans.length} active</p>
+    ${LOAN_SOURCES.map(s=>`
+      <div style="background:var(--s2);border:1px solid var(--bdr);border-radius:6px;padding:.7rem;margin-bottom:.45rem">
+        <div style="display:flex;justify-content:space-between;margin-bottom:.2rem">
+          <span style="font-size:.85rem;font-weight:700;color:#fff">${s.name}</span>
+          <span style="font-size:.72rem;color:var(--gold)">${s.rate}% p.a.</span>
+        </div>
+        <div style="font-size:.68rem;color:var(--dim);margin-bottom:.4rem">Max: ₦${s.max}B · ${s.conditions}</div>
+        <div class="grid3" style="gap:.35rem">
+          ${s.term.map(t=>`
+            <div>
+              <div style="font-size:.62rem;color:var(--dim);margin-bottom:.2rem">${t} MONTHS</div>
+              <button class="btn btn-outline btn-sm" style="width:100%;font-size:.62rem;padding:.3rem .2rem" onclick="onLoan('${s.id}',${Math.round(s.max*0.5)},${t})">₦${Math.round(s.max*0.5)}B</button>
+              <button class="btn btn-gold btn-sm" style="width:100%;font-size:.62rem;padding:.3rem .2rem;margin-top:.2rem" onclick="onLoan('${s.id}',${s.max},${t})">₦${s.max}B</button>
+            </div>`).join('')}
+        </div>
+      </div>`).join('')}`;
+  openModal('Take Loan', body);
+}
+
+function onLoan(sourceId, amount, months){ takeLoan(sourceId, amount, months); }
+
+function showSellModal(preRes){
+  const body = `
+    <p style="font-size:.75rem;color:var(--dim);margin-bottom:.8rem">Current market prices fluctuate monthly.</p>
+    ${Object.entries(G.resources).map(([k,r])=>`
+      <div style="background:var(--s2);border:1px solid var(--bdr);border-radius:6px;padding:.65rem;margin-bottom:.4rem">
+        <div style="display:flex;justify-content:space-between;margin-bottom:.2rem">
+          <span style="font-size:.85rem;font-weight:700">${RESOURCE_ICONS[k]} ${RESOURCE_NAMES[k]}</span>
+          <span style="font-size:.72rem;color:var(--gold)">₦${r.price}B per 10 units</span>
+        </div>
+        <div style="font-size:.68rem;color:var(--dim);margin-bottom:.4rem">Stock: ${r.stock} units</div>
+        <div style="display:flex;gap:.35rem">
+          <button class="btn btn-outline btn-sm" onclick="sellResource('${k}',10)">Sell 10u — ₦${(r.price).toFixed(0)}B</button>
+          <button class="btn btn-outline btn-sm" onclick="sellResource('${k}',50)">Sell 50u — ₦${(r.price*5).toFixed(0)}B</button>
+          <button class="btn btn-gold btn-sm" onclick="sellResource('${k}',100)">Sell 100u — ₦${(r.price*10).toFixed(0)}B</button>
+        </div>
+      </div>`).join('')}`;
+  openModal('Sell Resources', body);
+}
+
+function showAidModal(nationId){
+  const n = G.nations.find(x=>x.id===nationId);
+  if(!n) return;
+  const body = `
+    <p style="font-size:.82rem;margin-bottom:.8rem">Sending aid to <strong>${n.name}</strong> will improve relations. Treasury: ₦${G.treasury.toFixed(0)}B</p>
+    <div style="display:flex;flex-direction:column;gap:.4rem">
+      <button class="btn btn-outline" onclick="sendAid('${nationId}',10)">Send ₦10B Aid (+${Math.floor(10/5)} relations)</button>
+      <button class="btn btn-outline" onclick="sendAid('${nationId}',25)">Send ₦25B Aid (+${Math.floor(25/5)} relations)</button>
+      <button class="btn btn-gold" onclick="sendAid('${nationId}',50)">Send ₦50B Aid (+${Math.floor(50/5)} relations)</button>
+    </div>`;
+  openModal(`Send Aid to ${n.name}`, body);
+}
+
+function showDealModal(nationId){
+  const n = G.nations.find(x=>x.id===nationId);
+  if(!n) return;
+  const body = `
+    <p style="font-size:.75rem;color:var(--dim);margin-bottom:.8rem">Propose a resource trade deal with ${n.name}. The AI will respond in character.</p>
+    <div class="ig"><label>WE GIVE (resource)</label>
+      <select id="ourRes">${Object.keys(RESOURCE_NAMES).map(k=>`<option value="${k}">${RESOURCE_ICONS[k]} ${RESOURCE_NAMES[k]}</option>`).join('')}</select></div>
+    <div class="ig"><label>WE GIVE (amount/month)</label><input id="ourAmt" type="number" placeholder="10" min="1" value="10"/></div>
+    <div class="ig"><label>THEY GIVE (resource)</label>
+      <select id="theirRes">${Object.keys(RESOURCE_NAMES).map(k=>`<option value="${k}">${RESOURCE_ICONS[k]} ${RESOURCE_NAMES[k]}</option>`).join('')}</select></div>
+    <div class="ig"><label>THEY GIVE (amount/month)</label><input id="theirAmt" type="number" placeholder="15" min="1" value="15"/></div>
+    <div class="ig"><label>DURATION (months)</label><input id="dealDur" type="number" placeholder="24" min="1" value="24"/></div>
+    <button class="btn btn-gold btn-full" onclick="onDeal('${nationId}')">📨 SEND PROPOSAL (AI will respond)</button>`;
+  openModal(`Trade Deal with ${n.name}`, body);
+}
+
+function onDeal(nationId){
+  const or = document.getElementById('ourRes').value;
+  const oa = parseInt(document.getElementById('ourAmt').value)||10;
+  const tr = document.getElementById('theirRes').value;
+  const ta = parseInt(document.getElementById('theirAmt').value)||15;
+  const dur = parseInt(document.getElementById('dealDur').value)||24;
+  const btn = document.getElementById('mBody').querySelector('.btn-gold');
+  if(btn){ btn.disabled=true; btn.innerHTML='<span class="ai-loading"><span class="ai-dot"></span><span class="ai-dot"></span><span class="ai-dot"></span> AI NEGOTIATING...</span>'; }
+  proposeDeal(nationId, or, oa, tr, ta, dur);
+}
+
+function showSendWeaponsModal(nationId){
+  const n = G.nations.find(x=>x.id===nationId);
+  if(!n) return;
+  const body = `
+    <p style="font-size:.75rem;color:var(--dim);margin-bottom:.8rem">Send military hardware to ally ${n.name}. Strengthens relations significantly.</p>
+    <div style="display:flex;flex-direction:column;gap:.4rem">
+      ${WEAPONS_CATALOG.slice(0,5).map(w=>`<button class="btn btn-outline" onclick="sendWeapons('${nationId}','${w.id}',1)">${w.name} × 1 — ₦${(w.cost*0.8).toFixed(0)}B (+8 relations)</button>`).join('')}
+    </div>`;
+  openModal(`Send Weapons to ${n.name}`, body);
+}
+
+// ═══════════════════════════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════════════════════════
+function switchTab(name){
+  ['Overview','Military','Economy','Diplomacy','Intel'].forEach((t,i)=>{
+    document.getElementById('tp'+t).classList.toggle('active',t===name);
+    document.getElementById('bt'+i).classList.toggle('active',t===name);
+  });
+}
+
+// ═══════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════
+function startGame(){
+  const raw = document.getElementById('iName').value.trim();
+  isDev = raw.toUpperCase() === 'DEVMODE';
+  const name = isDev ? 'Dev Operator' : (raw || 'Gideon');
+  const cs = document.getElementById('iCtry').value;
+  const country = cs==='Custom' ? (document.getElementById('iCustom').value.trim()||'The Republic') : cs;
+  const diff = document.getElementById('iDiff').value;
+  G = newGame(name, country, diff);
+  save();
+  document.getElementById('start').style.display = 'none';
+  document.getElementById('game').style.display = 'flex';
+  renderAll();
+  addNews('info','You Have Assumed Office',`Welcome, ${G.name}. You are now the Commander-in-Chief of ${G.country}. The world is watching. Build alliances, manage your military, and keep your nation strong.`,{});
+  renderIntel();
+}
+
+document.getElementById('iCtry').addEventListener('change',function(){
+  document.getElementById('cGrp').style.display=this.value==='Custom'?'block':'none';
+});
+
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('start').style.display='flex';
+});
+
+</script>
+</body>
+</html>
