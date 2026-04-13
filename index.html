@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
+<title>PRESIDENT — The Simulation</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Playfair+Display:ital,wght@0,700;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#06081a;--surf:#0b0f28;--surf2:#111530;--bdr:#1d2550;--gold:#c8a020;--g2:#f0cc60;--txt:#e4dfc8;--dim:#6b6650;--grn:#18a86a;--red:#c42828}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow-x:hidden}
+body{background:var(--bg);color:var(--txt);font-family:'Playfair Display',serif;min-height:100vh;background-image:radial-gradient(ellipse at 15% 15%,rgba(30,40,120,.35) 0%,transparent 55%),radial-gradient(ellipse at 85% 85%,rgba(100,60,0,.25) 0%,transparent 55%)}
+.screen{display:none;min-height:100vh}
+/* START */
+#start{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem 1.5rem;text-align:center}
+.seal{font-size:4rem;margin-bottom:1rem;filter:drop-shadow(0 0 20px rgba(200,160,32,.4))}
+.pre{font-family:'Orbitron',monospace;font-size:.62rem;letter-spacing:.4em;color:var(--gold);margin-bottom:.4rem}
+.title{font-family:'Orbitron',monospace;font-size:clamp(2.5rem,11vw,5.5rem);font-weight:900;color:#fff;text-shadow:0 0 50px rgba(200,160,32,.5);letter-spacing:.05em;line-height:1}
+.sub{font-style:italic;color:var(--gold);font-size:clamp(.85rem,3vw,1.1rem);margin:.5rem 0 2rem}
+.sform{width:100%;max-width:420px}
+.ig{margin-bottom:.9rem;text-align:left}
+.ig label{display:block;font-family:'Orbitron',monospace;font-size:.58rem;letter-spacing:.2em;color:var(--gold);margin-bottom:.35rem}
+.ig input,.ig select{width:100%;padding:.72rem 1rem;background:var(--surf2);border:1px solid var(--bdr);color:var(--txt);font-family:'Playfair Display',serif;font-size:.95rem;border-radius:4px}
+.ig input:focus,.ig select:focus{outline:none;border-color:var(--gold)}
+.ig select option{background:var(--surf2)}
+.btn-s{width:100%;padding:.95rem;margin-top:.8rem;background:var(--gold);color:#000;font-family:'Orbitron',monospace;font-weight:700;font-size:.85rem;letter-spacing:.15em;border:none;border-radius:4px;cursor:pointer}
+.btn-s:active{background:var(--g2)}
+.btn-r{width:100%;padding:.68rem;margin-top:.5rem;background:transparent;color:var(--gold);border:1px solid var(--gold);font-family:'Orbitron',monospace;font-size:.7rem;letter-spacing:.12em;border-radius:4px;cursor:pointer}
+.snote{margin-top:1.5rem;font-style:italic;color:var(--dim);font-size:.75rem;max-width:360px}
+/* TOPBAR */
+.topbar{background:var(--surf);border-bottom:1px solid var(--bdr);padding:.65rem 1rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.tbn{font-family:'Orbitron',monospace;font-size:.7rem;font-weight:700;color:#fff}
+.tbc{font-size:.65rem;color:var(--gold);font-style:italic;margin-top:1px}
+.tbd{font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--dim);text-align:center}
+.tbr{font-family:'Orbitron',monospace;font-size:.54rem;color:var(--gold);margin-top:2px;text-align:center}
+.appill{padding:.26rem .65rem;border-radius:20px;font-family:'Orbitron',monospace;font-weight:700;font-size:.74rem;transition:all .3s;white-space:nowrap}
+/* BODY */
+.gbody{max-width:960px;margin:0 auto;padding:1rem}
+@media(min-width:860px){.gbody{display:grid;grid-template-columns:260px 1fr;gap:1rem;align-items:start}.scol{position:sticky;top:68px}}
+/* STATS PANEL */
+.spanel{background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:1rem;margin-bottom:1rem}
+.sphdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem;cursor:pointer;user-select:none}
+.sptit{font-family:'Orbitron',monospace;font-size:.58rem;letter-spacing:.2em;color:var(--gold)}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:.48rem}
+@media(min-width:480px) and (max-width:859px){.sgrid{grid-template-columns:repeat(3,1fr)}}
+.si .sl{display:flex;justify-content:space-between;font-size:.66rem;margin-bottom:2px}
+.sn{color:var(--dim);font-family:'Share Tech Mono',monospace}
+.sv{font-family:'Share Tech Mono',monospace;font-weight:bold}
+.sbar{height:5px;background:var(--bdr);border-radius:3px;overflow:hidden}
+.sfill{height:100%;border-radius:3px;transition:width .6s}
+.trow{border-top:1px solid var(--bdr);margin-top:.7rem;padding-top:.7rem;display:flex;justify-content:space-between;align-items:center}
+.tlbl{font-family:'Orbitron',monospace;font-size:.54rem;letter-spacing:.15em;color:var(--dim)}
+.tval{font-family:'Share Tech Mono',monospace;font-size:.92rem;font-weight:bold}
+/* EVENT */
+.epanel{background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:1.2rem;margin-bottom:1rem;border-left:3px solid var(--gold)}
+.emeta{display:flex;align-items:center;gap:.5rem;margin-bottom:.7rem}
+.ebadge{padding:.16rem .5rem;border-radius:3px;font-family:'Orbitron',monospace;font-size:.54rem;letter-spacing:.08em;font-weight:700;text-transform:uppercase}
+.be{background:rgba(34,193,195,.12);color:#22c1c3;border:1px solid #22c1c325}
+.bm{background:rgba(200,80,80,.12);color:#c85050;border:1px solid #c8505025}
+.bh{background:rgba(100,200,120,.12);color:#64c878;border:1px solid #64c87825}
+.bp{background:rgba(200,160,32,.12);color:#c8a020;border:1px solid #c8a02025}
+.bi{background:rgba(80,120,200,.12);color:#5078c8;border:1px solid #5078c825}
+.bs{background:rgba(200,100,200,.12);color:#c864c8;border:1px solid #c864c825}
+.bn{background:rgba(100,180,80,.12);color:#64b450;border:1px solid #64b45025}
+.bc{background:rgba(220,60,60,.18);color:#dc3c3c;border:1px solid #dc3c3c45;animation:pulse .9s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.etrn{font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--dim);margin-left:auto}
+.etit{font-size:1.08rem;font-weight:700;color:#fff;margin-bottom:.6rem;line-height:1.3}
+.edsc{font-size:.85rem;line-height:1.7;color:var(--txt);font-style:italic;margin-bottom:.9rem;border-left:2px solid var(--bdr);padding-left:.65rem}
+.adv{background:rgba(200,160,32,.05);border:1px solid rgba(200,160,32,.2);border-radius:4px;padding:.5rem .75rem;font-size:.74rem;color:var(--gold);margin-bottom:.9rem;font-style:italic}
+.adv::before{content:"📋 Advisor: "}
+.choices{display:flex;flex-direction:column;gap:.48rem}
+.cbtn{background:var(--surf2);border:1px solid var(--bdr);padding:.8rem 1rem;border-radius:6px;text-align:left;cursor:pointer;transition:all .18s;color:var(--txt);font-family:'Playfair Display',serif;font-size:.84rem;line-height:1.5;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;width:100%}
+.cbtn::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold);transform:scaleY(0);transition:transform .2s}
+.cbtn:hover::before,.cbtn:active::before{transform:scaleY(1)}
+.cbtn:hover,.cbtn:active{border-color:var(--gold);background:rgba(200,160,32,.06)}
+.clet{font-family:'Orbitron',monospace;font-size:.58rem;color:var(--gold);font-weight:700;display:block;margin-bottom:.2rem;letter-spacing:.08em}
+.chnt{font-size:.67rem;color:var(--dim);margin-top:.22rem;display:block;font-family:'Share Tech Mono',monospace}
+/* FEEDBACK */
+.fbar{padding:.65rem 1rem;margin-bottom:.8rem;border-radius:6px;font-size:.8rem;border-left:3px solid;display:none}
+.fbar.show{display:block}
+.fbar.good{background:rgba(24,168,106,.1);border-color:var(--grn);color:var(--grn)}
+.fbar.bad{background:rgba(196,40,40,.1);border-color:var(--red);color:#e06060}
+.fbar.neu{background:rgba(200,160,32,.07);border-color:var(--gold);color:var(--gold)}
+/* HISTORY */
+.hpanel{background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:.7rem 1rem}
+.htit{font-family:'Orbitron',monospace;font-size:.54rem;letter-spacing:.2em;color:var(--dim);margin-bottom:.45rem}
+.hi{font-size:.72rem;color:var(--dim);padding:.24rem 0;border-bottom:1px solid rgba(255,255,255,.04);font-style:italic}
+.hi:last-child{border-bottom:none}
+/* OVER */
+#over{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem 1.5rem;text-align:center}
+.oseal{font-size:3rem;margin-bottom:1rem}
+.ovrd{font-family:'Orbitron',monospace;font-size:clamp(1.4rem,6vw,2.4rem);font-weight:900;margin-bottom:.5rem}
+.osub{font-style:italic;color:var(--dim);margin-bottom:1.8rem;font-size:.88rem;max-width:400px}
+.fstats{width:100%;max-width:370px;background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:1rem;margin-bottom:1.5rem;text-align:left}
+.frow{display:flex;justify-content:space-between;padding:.34rem 0;border-bottom:1px solid var(--bdr);font-size:.8rem}
+.frow:last-child{border-bottom:none}
+.frow span:first-child{color:var(--dim);font-family:'Share Tech Mono',monospace}
+.frow span:last-child{font-family:'Share Tech Mono',monospace;font-weight:bold}
+.btn-ng{padding:.8rem 2rem;background:transparent;color:var(--gold);border:2px solid var(--gold);font-family:'Orbitron',monospace;font-weight:700;font-size:.78rem;letter-spacing:.15em;border-radius:4px;cursor:pointer}
+.btn-ng:active{background:var(--gold);color:#000}
+/* COLORS */
+.vg{color:#18c878}.vo{color:#18a86a}.vw{color:#d4a017}.vb{color:#c84040}.vc{color:#ff2020;animation:pulse .8s infinite}
+</style>
+</head>
+<body>
+
+<!-- START -->
+<div id="start" class="screen">
+<div class="seal">🏛️</div>
+<div class="pre">A Realistic Political Simulation</div>
+<div class="title">PRESIDENT</div>
+<div class="sub">The Weight of Power</div>
+<div class="sform">
+<div class="ig"><label>Your Full Name</label><input id="iName" type="text" placeholder="e.g. Gideon Musa" maxlength="30"/></div>
+<div class="ig"><label>Your Country</label>
+<select id="iCountry">
+<option value="Nigeria">🇳🇬 Nigeria</option>
+<option value="Ghana">🇬🇭 Ghana</option>
+<option value="Kenya">🇰🇪 Kenya</option>
+<option value="South Africa">🇿🇦 South Africa</option>
+<option value="Ethiopia">🇪🇹 Ethiopia</option>
+<option value="Senegal">🇸🇳 Senegal</option>
+<option value="Custom">🌍 My Own Country</option>
+</select></div>
+<div class="ig" id="cGrp" style="display:none"><label>Country Name</label><input id="iCustom" type="text" placeholder="e.g. Republic of Zindara" maxlength="28"/></div>
+<div class="ig"><label>Difficulty</label>
+<select id="iDiff">
+<option value="normal">Normal — Balanced challenges</option>
+<option value="hard">Hard — More crises, tighter budget</option>
+<option value="brutal">Brutal — Everything goes wrong</option>
+</select></div>
+<button class="btn-s" onclick="startGame()">⚡ ASSUME OFFICE</button>
+<button class="btn-r" id="resumeBtn" style="display:none" onclick="resumeGame()">↩ CONTINUE SAVED GAME</button>
+</div>
+<p class="snote">Manage 10 national resources. Survive 48 turns (4 years). Real-world crises fire randomly every turn — your choices have lasting consequences. Can you hold the country together?</p>
+</div>
+
+<!-- GAME -->
+<div id="game" class="screen">
+<div class="topbar">
+<div><div class="tbn" id="hName">President</div><div class="tbc" id="hCtry">Country</div></div>
+<div><div class="tbd" id="hDate">Jan 2025</div><div class="tbr" id="hTerm">YEAR 1 · TURN 1/48</div></div>
+<div class="appill" id="hAp">72%</div>
+</div>
+<div class="gbody">
+<div class="scol">
+<div class="spanel">
+<div class="sphdr" onclick="toggleStats()"><span class="sptit">NATIONAL DASHBOARD</span><span id="spIco" style="color:var(--dim);font-size:.75rem">▼</span></div>
+<div id="spBdy">
+<div class="sgrid" id="sgrid"></div>
+<div class="trow"><span class="tlbl">TREASURY</span><span class="tval" id="tvEl">₦0B</span></div>
+</div>
+</div>
+</div>
+<div>
+<div class="fbar" id="fbar"></div>
+<div class="epanel" id="epanel"></div>
+<div class="hpanel"><div class="htit">RECENT HISTORY</div><div id="hlist"><div class="hi" style="color:var(--dim)">No events yet...</div></div></div>
+</div>
+</div>
+</div>
+
+<!-- OVER -->
+<div id="over" class="screen">
+<div class="oseal" id="oSeal">🏛️</div>
+<div class="ovrd" id="oVerd">PRESIDENCY ENDED</div>
+<div class="osub" id="oSub">Your term is over.</div>
+<div class="fstats" id="fstats"></div>
+<button class="btn-ng" onclick="resetToStart()">↩ NEW GAME</button>
+</div>
+
+<script>
+const EVENTS=[
+{id:'e01',cat:'economy',title:'Global Oil Prices Collapse',
+desc:'International crude prices crashed 42% overnight after an OPEC+ breakdown. Oil accounts for 65% of government revenue. Markets are in freefall. Your finance minister is visibly panicking.',
+adv:'Act now. A week of hesitation could trigger a debt spiral that takes years to escape.',
+choices:[
+{t:'Emergency economic diversification — fund agriculture and tech sectors',h:'Reduces oil dependency long-term but painful short-term',fx:{treasury:-14,economy:4,education:2,infra:1,approval:3}},
+{t:'Request IMF emergency standby credit facility',h:'Stabilises cash but comes with strict austerity conditions',fx:{treasury:18,economy:-2,foreignRel:2,approval:-8}},
+{t:'Cut public wages 20% and remove all fuel subsidies immediately',h:'Saves money fast but triggers mass protests nationwide',fx:{treasury:10,economy:2,approval:-18,security:-5}},
+]},
+{id:'e02',cat:'economy',title:'Hyperinflation Hits 31%',
+desc:'Annual inflation has reached 31%. Food prices up 60%. Market women and transport workers are holding angry protests. The central bank is paralysed by political pressure.',
+adv:'The poor feel this the most. Your response here will define your entire legacy.',
+choices:[
+{t:'Raise interest rates aggressively and tighten the money supply',h:'Slows inflation but stifles economic growth',fx:{economy:6,approval:-5,foodSec:3,treasury:-2}},
+{t:'Introduce price controls on all food staples',h:'Popular short-term but creates supply shortages within 3 months',fx:{economy:-6,approval:8,foodSec:-8,treasury:-4}},
+{t:'Emergency food subsidy for the 30 million poorest households',h:'Expensive but directly cushions the most vulnerable citizens',fx:{treasury:-12,approval:12,foodSec:8,economy:-2}},
+]},
+{id:'e03',cat:'economy',title:'Three Foreign Corporations Announce Exit',
+desc:'Three major multinationals are withdrawing ₦85B in investments citing poor regulation, power outages, and insecurity. Six more companies are watching to decide whether to follow.',
+adv:'One public departure causes a cascade. Stop the bleeding before it becomes a flood.',
+choices:[
+{t:'Launch business-friendly regulatory reforms and 5-year tax holidays',h:'Long-term fix showing credible commitment to investors',fx:{treasury:-4,economy:7,foreignRel:6,approval:2}},
+{t:'Personal presidential calls to CEOs — offer tailored special deals',h:'Short-term retention but creates favouritism optics',fx:{treasury:4,economy:3,foreignRel:4,approval:-3}},
+{t:'Nationalise departing companies and blame foreign exploitation',h:'Populist applause but permanently destroys investor confidence',fx:{treasury:7,economy:-12,foreignRel:-15,approval:6}},
+]},
+{id:'e04',cat:'economy',title:'Massive Offshore Oil Field Discovered',
+desc:'Geologists confirm a 4-billion-barrel offshore reserve that could transform finances for 30 years. International oil majors, local contractors, and two neighbouring countries are all making competing claims.',
+adv:'A once-in-a-generation opportunity. Do not waste it on short-term calculations.',
+choices:[
+{t:'State-led development with strict revenue-to-savings rule',h:'Slower pace but builds a sovereign wealth fund',fx:{treasury:18,economy:7,approval:5,foreignRel:-2}},
+{t:'Joint venture with international oil majors for fastest extraction',h:'Faster revenue but a smaller national share of proceeds',fx:{treasury:28,economy:5,foreignRel:8,approval:-2}},
+{t:'Full national ownership — legally expel all foreign claims',h:'Maximum revenue potential but serious diplomatic risk',fx:{treasury:14,economy:3,foreignRel:-10,approval:8,military:-3}},
+]},
+{id:'e05',cat:'economy',title:'Sovereign Debt Default Is 30 Days Away',
+desc:'Debt-to-GDP has crossed 85%. Creditors threaten junk status. Government cannot pay civil servant salaries next month. Banks are quietly beginning capital flight procedures.',
+adv:'This is the edge of a cliff. One wrong step and there is no recovery.',
+choices:[
+{t:'Negotiate debt restructuring — accept creditor austerity conditions',h:'Painful cuts but avoids catastrophic default',fx:{treasury:14,economy:-4,approval:-13,infra:-4,healthcare:-4}},
+{t:'Selectively default on external debt, prioritise domestic spending',h:'Protects citizens short-term but guarantees long-term isolation',fx:{treasury:5,economy:-10,foreignRel:-18,approval:4}},
+{t:'Print money to cover all obligations',h:'Buys weeks of time but causes devastating inflation surge',fx:{treasury:20,economy:-15,approval:-8,foodSec:-6}},
+]},
+{id:'e06',cat:'economy',title:'Largest Crypto Exchange Collapses Overnight',
+desc:'The biggest crypto platform folded, wiping out ₦40B in citizen savings. Young people posting their life savings gone has gone viral. Your finance minister calls it "a regulatory failure."',
+adv:'Young voters were hit hardest. This is simultaneously a financial and political crisis.',
+choices:[
+{t:'Compensate small investors under ₦5M from state emergency fund',h:'Expensive but rebuilds goodwill with the youth',fx:{treasury:-9,approval:10,economy:-2}},
+{t:'Prosecute founders and launch comprehensive crypto regulation',h:'Justice-focused but does not help victims right now',fx:{approval:4,economy:2,foreignRel:2}},
+{t:'Dismiss it as personal greed — zero government intervention',h:'Saves money but permanently alienates young voters',fx:{treasury:2,approval:-12,economy:-2}},
+]},
+{id:'e07',cat:'economy',title:'National Currency Hits Historic Low',
+desc:'The exchange rate has hit a historic low. Fuel, medicine, and electronics prices doubled. Middle-class savings are wiped out. Citizens with foreign currency are hoarding. National humiliation is palpable.',
+adv:'Currency collapse has psychological effects far beyond pure economics. Citizens feel national shame.',
+choices:[
+{t:'Float the currency fully — let market find true value',h:'Correct long-term direction but very painful short-term adjustment',fx:{treasury:5,economy:-7,approval:-9,foreignRel:6}},
+{t:'Impose capital controls — restrict all foreign currency purchases',h:'Slows bleeding but creates a parallel black market',fx:{treasury:3,economy:-5,approval:-4,foreignRel:-7}},
+{t:'Emergency import substitution policy — reduce foreign dependency urgently',h:'Right strategic direction but results take 12-18 months',fx:{treasury:-8,economy:5,approval:3,infra:3}},
+]},
+{id:'m01',cat:'military',title:'Military Coup Attempt at 3am',
+desc:'Armed soldiers surrounded the Presidential Villa at 3am. Your loyal guards held the perimeter for 90 minutes. Intelligence suggests three senior generals were behind the plot — but hard evidence is thin.',
+adv:'Do not overreact or underreact. Both can finish your presidency faster than the plotters.',
+choices:[
+{t:'Arrest all three generals immediately — make a very public example',h:'Bold and decisive but risks wider mutiny if evidence is thin',fx:{military:-8,security:8,approval:5,foreignRel:-5}},
+{t:'Quietly remove them from command and post them on "diplomatic missions"',h:'De-escalates safely but signals weakness to future plotters',fx:{military:3,security:-2,approval:-2}},
+{t:'Address the nation, pardon all involved, and promise an army pay raise',h:'Completely defuses tension but sets a very dangerous precedent',fx:{military:9,treasury:-10,approval:7,security:-6}},
+]},
+{id:'m02',cat:'military',title:'Insurgents Capture Two Towns',
+desc:'A militant group has raised their flag over two local government areas and is executing officials publicly. Over 5,000 civilians have fled. Your army chief needs resources and full authority to act.',
+adv:'Every week of inaction costs lives, territory, and your presidential credibility.',
+choices:[
+{t:'Full military offensive — 10,000 troops and air support authorised',h:'Fast results but high civilian casualty risk draws international criticism',fx:{treasury:-14,military:-4,security:10,approval:3,foreignRel:-5}},
+{t:'Negotiate through traditional rulers and religious leaders first',h:'Slower and harder but preserves civilian lives',fx:{treasury:-4,security:3,approval:6,foreignRel:4}},
+{t:'Request foreign military intelligence and special forces support',h:'More effective but raises uncomfortable sovereignty questions',fx:{treasury:-5,military:5,security:8,foreignRel:-3,approval:-2}},
+]},
+{id:'m03',cat:'military',title:'287 Students Kidnapped by Bandits',
+desc:'Armed bandits took 287 secondary school students from a boarding school. Parents are wailing on live TV. The hashtag is global. The US, UK, and France have all offered assistance. No confirmed location yet.',
+adv:'The whole world is watching. Act with urgency but not recklessness — lives depend on it.',
+choices:[
+{t:'Accept FBI and Interpol intelligence assistance immediately',h:'More resources increases the probability of a safe rescue',fx:{treasury:-5,security:8,approval:10,foreignRel:5,military:-2}},
+{t:'Pay the ransom quietly and deny it publicly',h:'Children safely returned but guarantees more kidnappings will follow',fx:{treasury:-9,security:-9,approval:5}},
+{t:'Military rescue operation — zero negotiations with terrorists',h:'Strong in principle but carries a very high risk of casualties',fx:{treasury:-10,military:4,security:5,approval:-5}},
+]},
+{id:'m04',cat:'military',title:'Army Demands 50% Pay Raise or Else',
+desc:'The Chief of Army Staff formally demanded a 50% pay raise across all ranks. In private: "Hungry soldiers are dangerous soldiers, Mr. President." The military budget is already the biggest line item.',
+adv:'Underpaid soldiers are historically the number one proven coup risk factor.',
+choices:[
+{t:'Approve the full 50% raise — fund it by cutting other sectors',h:'Loyal army secured but serious damage to health and education',fx:{treasury:-12,military:15,healthcare:-4,education:-3,approval:3}},
+{t:'Offer 25% raise now plus non-cash benefits — housing and healthcare',h:'Compromise that satisfies most without risking bankruptcy',fx:{treasury:-7,military:8,approval:2}},
+{t:'Reject the demand publicly — explain fiscal reality to the nation',h:'Principled stance but military morale falls sharply',fx:{military:-9,approval:-2,security:-4}},
+]},
+{id:'m05',cat:'military',title:'Three Oil Pipelines Bombed Overnight',
+desc:'Militants destroyed three major pipelines, cutting oil output by 40%. They claim retaliation for resource exploitation. Repair takes 3-4 months. Every day costs ₦2B in lost revenue.',
+adv:'This is simultaneously an economic, security, and political emergency.',
+choices:[
+{t:'Emergency declaration — fast-track repairs and deploy 5,000 troops',h:'Direct action but militarises a fundamentally political problem',fx:{treasury:-17,economy:-4,military:-3,security:5,approval:-3}},
+{t:'Open serious dialogue with community leaders to address grievances',h:'Slower but addresses the actual root cause of the attacks',fx:{treasury:-4,economy:-7,approval:5,security:3}},
+{t:'Blame opposition politicians and announce high-profile arrests',h:'Deflects all blame but fixes absolutely nothing on the ground',fx:{treasury:-7,economy:-9,approval:-3,security:-2}},
+]},
+{id:'h01',cat:'health',title:'Hemorrhagic Fever: 35% Fatality Rate',
+desc:'A viral hemorrhagic fever has infected 1,200 people in three states with a 35% fatality rate. WHO issued a Level 3 alert. Hospitals are overwhelmed. Healthcare workers are refusing to show up for shifts.',
+adv:'This can spiral into a full national pandemic in 30 days if not contained right now.',
+choices:[
+{t:'Full quarantine of affected states — international medical teams invited in',h:'Aggressive containment causes major economic disruption',fx:{treasury:-14,healthcare:10,approval:-5,foreignRel:5,economy:-4}},
+{t:'Expand hospital capacity and fast-track WHO coordination',h:'Balanced clinical response managing both health and economy',fx:{treasury:-9,healthcare:6,approval:3,foreignRel:4}},
+{t:'Downplay severity publicly to prevent economic panic',h:'Catastrophically backfires the moment the true scale becomes known',fx:{treasury:-2,healthcare:-12,approval:-16,foreignRel:-8}},
+]},
+{id:'h02',cat:'health',title:'Doctors on Indefinite Strike — 3 Weeks',
+desc:'All hospital workers are on strike demanding 200% salary increase, modern equipment, and safe conditions. Patients are dying in corridors without treatment. International human rights bodies have issued statements.',
+adv:'Every day this continues costs lives and your approval rating simultaneously.',
+choices:[
+{t:'Meet all demands in full — emergency health sector budget injection',h:'Ends the crisis completely but extremely expensive',fx:{treasury:-17,healthcare:15,approval:8}},
+{t:'Offer partial increase now and negotiate the remainder over 6 months',h:'Workers may accept this reasonable compromise',fx:{treasury:-9,healthcare:8,approval:4}},
+{t:'Declare essential services — threaten to terminate all strikers',h:'Breaks the strike by force but creates decade-long resentment',fx:{treasury:-2,healthcare:-4,approval:-8,security:-3}},
+]},
+{id:'h03',cat:'health',title:'New Pandemic: R0 of 3.2 Detected in Capital',
+desc:'A novel respiratory virus in your capital shows an R0 of 3.2 and 2.1% fatality rate. WHO teams are flying in. Borders are still open. Your health minister demands an immediate lockdown decision from you personally.',
+adv:'Early aggressive action saves months of suffering. Every week of hesitation is a week lost.',
+choices:[
+{t:'Immediate border closure, national lockdown, and mass testing launch',h:'Aggressive containment — serious economic cost in the short term',fx:{treasury:-19,healthcare:12,economy:-10,approval:4,foreignRel:-4}},
+{t:'Enhanced surveillance, border screening, and targeted quarantines',h:'Balanced approach managing both health and economic activity',fx:{treasury:-9,healthcare:6,economy:-3,approval:5}},
+{t:'Keep everything open and trust citizens to protect themselves',h:'Preserves economy now but catastrophic if the virus spreads widely',fx:{healthcare:-15,economy:2,approval:-12}},
+]},
+{id:'p01',cat:'political',title:'Finance Minister Caught Stealing ₦12B',
+desc:'An investigative journalist published documents showing your finance minister diverted ₦12B into private shell companies. The evidence is credible and detailed. Opposition is calling for your resignation too.',
+adv:'How you handle this will define your anti-corruption credentials for the rest of your term.',
+choices:[
+{t:'Fire minister immediately — refer to anti-corruption agency for prosecution',h:'Decisive and morally correct — builds trust with citizens and the world',fx:{approval:13,economy:-2,foreignRel:5}},
+{t:'Suspend minister pending a formal presidential inquiry committee',h:'Procedurally correct but widely perceived as protecting him',fx:{approval:2,economy:-1}},
+{t:'Defend minister publicly — call it a political witch-hunt by enemies',h:'Protects your ally but permanently destroys your credibility',fx:{approval:-19,foreignRel:-8,economy:-4}},
+]},
+{id:'p02',cat:'political',title:'Capital Flooded With Protesters for 5 Days',
+desc:'Hundreds of thousands have filled the capital under #EndBadGovernance. Demands: end corruption, fix power, lower food prices. Largely peaceful but a small group is burning vehicles. International media is live-streaming everything.',
+adv:'How a government responds to peaceful protest defines its democratic character permanently.',
+choices:[
+{t:'Address protesters personally on national TV with concrete timelines',h:'Engages citizens directly and shows genuine presidential courage',fx:{approval:9,security:3,economy:-2}},
+{t:'Send food trucks and promise a government review committee',h:'Buys short-term calm but looks like obvious bribery to everyone watching',fx:{approval:2,treasury:-4,security:-2}},
+{t:'Deploy riot police and military to disperse all crowds immediately',h:'Ends protest fast but invites international condemnation and more anger',fx:{approval:-15,security:4,foreignRel:-10,military:2}},
+]},
+{id:'p03',cat:'political',title:'Your Own Party Moves to Remove You',
+desc:'Seventeen senators from your ruling party have signed a letter demanding resignation, citing "total loss of direction." A third of your cabinet is quietly backing them. National elections are 18 months away.',
+adv:'A party split at this stage makes electoral victory mathematically very unlikely.',
+choices:[
+{t:'Major cabinet reshuffle — bring rebel leaders inside your government',h:'Pragmatic power management that absorbs the immediate threat',fx:{approval:4,economy:-1,military:-1}},
+{t:'Call their bluff — go directly to the public with your record',h:'Bold democratic move but dangerous without real popular support',fx:{approval:7,security:-2,economy:2}},
+{t:'Investigate rebel senators for corruption to intimidate them',h:'Silences opponents but signals your administration fears scrutiny',fx:{approval:-8,foreignRel:-6,security:3}},
+]},
+{id:'p04',cat:'political',title:'Electoral Commission Chairman Caught on Tape',
+desc:'The INEC chairman is caught on tape saying results can be "adjusted" in your favour. Viral in hours. Three EU election observer missions have issued a joint condemnation. Your party insists the tape is fabricated.',
+adv:'Democracy itself is on trial. Your reaction will be the verdict history records.',
+choices:[
+{t:'Fire the electoral chairman and launch full commission reform',h:'Strongest democratic signal possible — costly politically',fx:{approval:11,foreignRel:12,economy:3}},
+{t:'Order investigation while chairman remains in his post',h:'Weak non-response — looks deeply complicit to everyone watching',fx:{approval:-4,foreignRel:-4}},
+{t:'Deny tape authenticity and attack the journalists who published it',h:'Satisfies hardliners but everyone already knows the truth',fx:{approval:-13,foreignRel:-18,economy:-4}},
+]},
+{id:'i01',cat:'international',title:'United States Threatens Targeted Sanctions',
+desc:'The US State Department issued a 60-day ultimatum: release jailed journalists and reform press freedom laws or face targeted financial sanctions on officials and Central Bank dollar transactions.',
+adv:'Dollar sanctions would cripple all import trade. This threat is completely real.',
+choices:[
+{t:'Release all journalists and enact genuine press freedom reforms',h:'The right choice — only costs political capital not money',fx:{approval:8,foreignRel:15,economy:4}},
+{t:'Release some journalists and promise ongoing review of others',h:'Partial compliance buys some goodwill but does not fully satisfy',fx:{approval:3,foreignRel:6,economy:1}},
+{t:'Reject US interference and pivot towards China-Russia alignment',h:'Populist applause but economically very dangerous long-term',fx:{approval:5,foreignRel:-15,economy:-8,military:3}},
+]},
+{id:'i02',cat:'international',title:"China's ₦2 Trillion Infrastructure Offer",
+desc:"China's ambassador presents a massive deal — airports, railways, undersea fibre — at 3% interest with a 10-year grace period. But a buried sovereignty clause has seriously alarmed your attorney general.",
+adv:"China's deals look excellent on paper. Read every clause your legal team flags carefully.",
+choices:[
+{t:'Accept but insist on full legal review and removal of sovereignty clause first',h:'Best possible outcome if China agrees to revise the contract',fx:{treasury:18,infra:15,foreignRel:5,economy:5}},
+{t:'Accept as presented to move fast on desperately needed infrastructure',h:'Fastest execution but national sovereignty is at genuine legal risk',fx:{treasury:28,infra:20,foreignRel:6,economy:8,approval:4}},
+{t:'Decline politely and seek Western or multilateral financing alternatives',h:'Preserves full sovereignty but loses this specific opportunity',fx:{treasury:-2,infra:2,foreignRel:-3}},
+]},
+{id:'i03',cat:'international',title:'200,000 War Refugees Cross Your Border',
+desc:'Civil war next door drove 200,000 refugees across your border in one week. Camps are overwhelmed. Your citizens are angry about resource competition. Intelligence warns armed militias may have infiltrated the flow.',
+adv:'This is simultaneously a humanitarian emergency and a national security challenge.',
+choices:[
+{t:'Full humanitarian response — UNHCR partnership plus tight border security screening',h:'Morally correct and internationally praised but expensive',fx:{treasury:-11,security:-3,foreignRel:12,approval:2,foodSec:-4}},
+{t:'Close borders completely — national security must come first',h:'Popular domestically but internationally condemned',fx:{security:5,foreignRel:-12,approval:4}},
+{t:'Limited controlled entry with strict individual security screening',h:'Balanced approach but fully satisfies neither side',fx:{treasury:-6,security:2,foreignRel:4,approval:-1}},
+]},
+{id:'i04',cat:'international',title:'African Union Offers You the Chairpersonship',
+desc:'The AU nominated your country for the rotating chairpersonship. It requires hosting 5 summits and committing ₦8B annually. Your foreign minister is thrilled. Your finance minister is very much not.',
+adv:'Global platform. Real financial cost. Choose with both eyes open.',
+choices:[
+{t:'Accept in full — host all summits with appropriate ceremony',h:'Enormous prestige for the nation but genuine strain on the budget',fx:{treasury:-8,foreignRel:15,approval:6,economy:2}},
+{t:'Accept but negotiate a 50% reduced financial commitment',h:'Smart compromise between prestige and fiscal responsibility',fx:{treasury:-4,foreignRel:8,approval:3}},
+{t:'Decline — domestic crises clearly take priority right now',h:'Fiscally sensible but permanently damages your international standing',fx:{foreignRel:-8,approval:-3}},
+]},
+{id:'s01',cat:'social',title:'University Strike — 8 Months, 2M Students at Home',
+desc:'Lecturers have been on strike 8 months over unpaid allowances and collapsed research funding. 2.3 million students are stuck at home. Parents are furious. Opposition made it their central campaign issue.',
+adv:'A lost academic year is an irreversible theft from young people who did nothing wrong.',
+choices:[
+{t:'Pay all owed allowances in full — emergency education budget release',h:'Ends the strike immediately and comprehensively',fx:{treasury:-14,education:12,approval:10}},
+{t:'Negotiate phased payment over 6 months — begin with 50% now',h:'Fiscally practical but lecturers may reject it',fx:{treasury:-8,education:5,approval:4}},
+{t:'Fast-track private university accreditation to absorb displaced students',h:'Long-term structural reform but does absolutely nothing right now',fx:{treasury:-4,education:2,approval:-2,economy:2}},
+]},
+{id:'s02',cat:'social',title:'Fuel Subsidy Removed — Petrol Tripled Overnight',
+desc:'Your economic team convinced you to remove the fuel subsidy saving ₦4T annually. But petrol tripled overnight. Transport fares doubled. Workers, students, and market women are on the streets in every city.',
+adv:'Economically necessary but politically explosive. Communicate clearly or lose everything.',
+choices:[
+{t:'Announce immediate direct cash transfers to the poorest 20 million households',h:'Directly cushions the impact — expensive but genuinely effective',fx:{treasury:-14,approval:5,economy:8,foodSec:-3}},
+{t:'Partial reinstatement — remove subsidy on premium grade fuel only',h:'Middle ground that fully satisfies nobody',fx:{treasury:-8,approval:-2,economy:3}},
+{t:'Full reversal — restore the subsidy entirely',h:'Ends all protests but permanently wastes the entire economic reform',fx:{treasury:-24,approval:10,economy:-5}},
+]},
+{id:'s03',cat:'social',title:'Youth Unemployment Hits 45%',
+desc:'New data shows nearly half of 18-35 year olds are unemployed. Brain drain is accelerating. "Japa or survive" is the defining phrase of this generation. You need a credible and visible answer now.',
+adv:'Lose the youth and you lose the future. This is your most dangerous long-term threat.',
+choices:[
+{t:'₦500B national youth enterprise fund — mass skills training and startup support',h:'Transformative if properly executed — your biggest single investment',fx:{treasury:-20,economy:6,education:5,approval:8}},
+{t:'National public works programme — government as employer of last resort',h:'Creates immediate visible jobs but is not fiscally scalable',fx:{treasury:-12,approval:6,infra:4,economy:2}},
+{t:'Tax incentives for all companies that hire and train under-35 workers',h:'Market-led approach — slower results but significantly lower cost',fx:{treasury:-4,economy:4,approval:3}},
+]},
+{id:'s04',cat:'social',title:'Farmers-Herders Clash: 340 Dead in 2 Weeks',
+desc:'Escalating violence between farming and herding communities killed 340 people in two weeks. Villages are burning. Ethnic militias mobilising on both sides. Traditional rulers are demanding immediate federal action.',
+adv:'If this spreads to five states simultaneously, military containment becomes physically impossible.',
+choices:[
+{t:'Emergency national peace dialogue — all ethnic and religious leaders summoned',h:'Addresses root causes and builds lasting reconciliation',fx:{treasury:-5,security:5,approval:6,military:-2}},
+{t:'Massive military deployment — buffer zones and forced disarmament of all militias',h:'Stops violence fast but creates deep and lasting local resentment',fx:{treasury:-10,security:10,military:-4,approval:-3}},
+{t:'Presidential commission to investigate and prosecute all perpetrators',h:'Justice-focused but takes many months before any real results appear',fx:{treasury:-4,security:2,approval:3,foreignRel:3}},
+]},
+{id:'s05',cat:'social',title:'Grammy Stage: "Your Government Is Killing Us"',
+desc:'A globally famous artist from your country delivered a 10-minute live condemnation of your administration to 500 million viewers. The clip has 200M plays. He is calling for a global boycott of your country.',
+adv:'This is a cultural moment that defines how the entire world sees your government.',
+choices:[
+{t:'Invite the artist to State House for a televised open dialogue',h:'Mature statesmanship — can turn a critic into an unexpected ally',fx:{approval:10,foreignRel:8,economy:2}},
+{t:'Officially ignore it — push back only through diplomatic back-channels',h:'Low-key approach that avoids further escalation',fx:{approval:-2,foreignRel:-2}},
+{t:'Revoke his passport and charge him with deliberate falsehood',h:'Vindictive reaction that will backfire spectacularly and globally',fx:{approval:-15,foreignRel:-14,security:2}},
+]},
+{id:'n01',cat:'environment',title:'Worst Flooding in 60 Years — 1.4M Displaced',
+desc:'Record flooding across the south displaced 1.4 million people. Over 200 dead. Farms destroyed, roads washed out, hospitals flooded. Climate scientists say this is now the permanent new normal.',
+adv:'Disaster relief must happen immediately. Climate resilience infrastructure must follow.',
+choices:[
+{t:'₦50B emergency relief fund plus UN climate adaptation financing application',h:'Comprehensive response — immediate relief and long-term investment',fx:{treasury:-19,healthcare:3,infra:-4,approval:8,foreignRel:4}},
+{t:'State governments lead response — federal support provided only on request',h:'Respects federalism but federal response appears visibly too slow',fx:{treasury:-7,infra:-7,approval:-2}},
+{t:'Fast-track a national flood infrastructure programme — dams and drainage',h:'Right long-term investment but results arrive in 2-3 years minimum',fx:{treasury:-14,infra:10,approval:4,economy:2}},
+]},
+{id:'n02',cat:'environment',title:'National Power Grid Collapses — Again',
+desc:'The national grid has completely failed for the third time this year. All states are in darkness. Hospital generators running out of diesel. Every industry shut down. The economic cost is ₦3B per day offline.',
+adv:'Nothing else works without power. This failure underlies every other national crisis.',
+choices:[
+{t:'₦300B emergency power overhaul — international technical partnership',h:'Transformative if properly executed — your largest possible investment',fx:{treasury:-24,energy:20,economy:8,infra:8,approval:10}},
+{t:'Full privatisation of the power sector to market operators',h:'Long-term efficiency gains but short-term pain from higher tariffs',fx:{treasury:10,energy:8,economy:3,approval:-6}},
+{t:'Publicly blame the distribution companies and promise another committee',h:'Deflects all blame completely but repairs absolutely nothing',fx:{energy:-5,approval:-8,economy:-4}},
+]},
+{id:'n03',cat:'environment',title:'Severe Drought — 70% of Harvest Lost',
+desc:'Worst drought in 40 years destroyed 70% of the national harvest. Livestock dying in the north. Food prices about to triple. Your agriculture minister warns of potential famine conditions within 6 months.',
+adv:'Famine is always political as much as natural. No excuses will be accepted by history.',
+choices:[
+{t:'Emergency food imports and deployment of strategic grain reserves',h:'Fast and direct — saves lives right now',fx:{treasury:-17,foodSec:13,approval:7}},
+{t:'Coordinate international food aid through FAO and the World Food Programme',h:'Gets international resources and political goodwill simultaneously',fx:{treasury:-4,foodSec:8,foreignRel:6,approval:4}},
+{t:'Nationwide food rationing and strict price controls on all staples',h:'Manages scarcity on paper but creates real shortages in practice',fx:{treasury:-5,foodSec:-4,approval:-4,economy:-5}},
+]},
+{id:'x01',cat:'crisis',title:'Assassination Attempt on Your Life',
+desc:'Three armed men breached the State House perimeter at dawn. Your guards held them for 90 minutes. Intelligence suggests a foreign state connection. Your VP, two generals, and your own brother-in-law are all under suspicion.',
+adv:'Do not overreact. Accusations without evidence destroy institutions faster than assassins do.',
+choices:[
+{t:'Quiet multi-agency investigation — international intelligence partners only',h:'Methodical, legally controlled, and constitutionally sound',fx:{military:3,security:5,approval:4,foreignRel:-2}},
+{t:'Full public transparency — parliamentary joint security committee inquiry',h:'Democratic and transparent but signals vulnerability to enemies',fx:{security:2,approval:8,foreignRel:2,military:-2}},
+{t:'Arrest all four suspects immediately and sort the evidence out later',h:'Paranoid overreaction — severely damages institutions and your image',fx:{security:3,military:-5,approval:-6,foreignRel:-8}},
+]},
+{id:'x02',cat:'crisis',title:'You Collapse on Live TV at a State Function',
+desc:'You collapsed at a formal state dinner broadcast nationally. Doctors say stress-induced exhaustion but foreign media speculates terminal illness. Markets are nervous. Your VP is quietly consolidating power.',
+adv:'You must be seen to be in control. In politics, perception and reality are the same thing.',
+choices:[
+{t:'Full public medical disclosure — return to work and public duty immediately',h:'Transparency wins trust and shuts down all dangerous speculation',fx:{approval:8,economy:3,foreignRel:4}},
+{t:'Take formal medical leave and let VP officially handle presidential duties',h:'Constitutionally correct but VP consolidates power very rapidly',fx:{approval:-3,economy:-2,military:-2}},
+{t:'Deny everything — aggressive public appearances to prove your health',h:'Works if you are genuinely healthy. Catastrophic if you are not.',fx:{approval:3,economy:2}},
+]},
+{id:'x03',cat:'crisis',title:'Census Results Disputed — Country at Breaking Point',
+desc:'Three major ethnic groups all claim census data was falsified to reduce their populations, affecting political representation and federal revenue. Governors are threatening to withhold revenue. The word "secession" is being used publicly.',
+adv:'Population data in this country is political power. This dispute is really about resources and parliamentary seats.',
+choices:[
+{t:'Commission an independent international audit of all census methodology',h:'Credible confidence-building measure that buys essential time',fx:{approval:5,foreignRel:6,security:-2,economy:-2}},
+{t:'Renegotiate the revenue formula so it no longer depends on population headcount',h:'Structural fix that removes the actual reason people fight over census data',fx:{approval:5,economy:3,security:3,treasury:-5}},
+{t:'Declare results final and binding — any challenge is treasonous',h:'Decisive but adds fuel to a fire that is already dangerously hot',fx:{security:3,approval:-10,military:2,foreignRel:-4}},
+]},
+{id:'x04',cat:'crisis',title:'Sophisticated Cyberattack Cripples Government Systems',
+desc:'A state-sponsored attack simultaneously crippled the Central Bank, electoral commission database, and Defence Ministry servers. Intelligence points to a regional rival. Citizen biometric data may have been stolen.',
+adv:'This is 21st-century warfare. Your response must match the sophistication of the attack.',
+choices:[
+{t:'Emergency cyber response team — Israeli and US cybersecurity firms contracted immediately',h:'Fast technical resolution with acknowledged international expertise',fx:{treasury:-8,security:8,foreignRel:-2,economy:-3,military:3}},
+{t:'Public attribution and formal diplomatic protest note to the offending nation',h:'Principled stance but may trigger escalation',fx:{security:3,foreignRel:-8,approval:4}},
+{t:'Quietly restore systems and make no public statements to prevent panic',h:'Avoids panic but signals dangerous vulnerability to all future attackers',fx:{security:-2,approval:-3,economy:-2}},
+]},
+{id:'x05',cat:'crisis',title:'Three Governors Threaten Secession',
+desc:'Governors of three oil-rich states issued a joint communique threatening independence in 90 days unless the federal revenue formula gives resource states 50% direct ownership. Your army chief is asking for instructions.',
+adv:'Your most serious constitutional crisis. Every word you say now will be studied by historians.',
+choices:[
+{t:'Immediately convene emergency constitutional conference — all 36 governors',h:'Democratic, inclusive, and powerfully de-escalating',fx:{approval:6,foreignRel:4,security:3,economy:-3}},
+{t:'Deploy army to affected state capitals — federalism is non-negotiable',h:'Strongest constitutional position but risks actual armed conflict',fx:{military:-5,security:5,approval:-8,foreignRel:-6}},
+{t:'Quietly negotiate a special revenue deal with the three governors privately',h:'Resolves immediate crisis but sets dangerous precedent for all other governors',fx:{treasury:-10,approval:2,security:5,economy:2}},
+]},
+{id:'o01',cat:'economy',title:'Tech Startup Boom — The World Is Watching',
+desc:'Three homegrown startups achieved unicorn status in 18 months. International VCs are calling it "Africa\'s next frontier." ₦180B in foreign venture capital has arrived. But founders cite bureaucracy and insecurity as barriers.',
+adv:"Don't kill the golden goose with red tape. This moment will not wait for you.",
+choices:[
+{t:'Create a Special Tech Economic Zone — cut all regulatory barriers for tech',h:'Bold reform that multiplies the startup boom dramatically',fx:{treasury:10,economy:10,education:5,foreignRel:6,approval:5}},
+{t:'Government venture capital fund — state takes equity stakes in top startups',h:'Government participates in the financial upside',fx:{treasury:-5,economy:6,approval:4}},
+{t:'The market is working fine — no special government intervention needed',h:'Conservative non-intervention — misses the chance to meaningfully accelerate',fx:{economy:3,approval:1}},
+]},
+{id:'o02',cat:'social',title:'National Team Qualifies for World Cup',
+desc:'First World Cup qualification in 12 years. The country is in genuine euphoria. The football federation requests ₦15B for preparation. Sponsorship deals and diplomatic soft power opportunities are enormous.',
+adv:'This kind of national unity is rare. Use it wisely.',
+choices:[
+{t:'Full ₦15B investment — maximum preparation and continental dominance',h:'Massive national morale boost and extraordinary global visibility',fx:{treasury:-15,approval:15,foreignRel:8,economy:3}},
+{t:'₦8B targeted investment — competitive preparation within fiscal constraints',h:'Balanced support that gets the team ready without breaking the bank',fx:{treasury:-8,approval:10,foreignRel:4}},
+{t:'₦3B only — football is not a priority with current active crises',h:'Fiscally responsible but deeply and visibly unpopular across all demographics',fx:{treasury:-3,approval:-5}},
+]},
+];
+
+// STATE
+let G={};
+function cl(v,lo=0,hi=100){return Math.min(hi,Math.max(lo,v))}
+function rn(n){return Math.floor(Math.random()*n)}
+function fresh(name,country,diff){
+  const m=diff==='brutal'?.72:diff==='hard'?.87:1;
+  return{name,country,diff,turn:1,maxTurns:48,startYear:2025,
+    stats:{approval:cl(Math.round(65*m+rn(10))),economy:cl(Math.round(50*m+rn(10))),military:cl(Math.round(50*m+rn(10))),healthcare:cl(Math.round(45*m+rn(10))),education:cl(Math.round(45*m+rn(10))),infra:cl(Math.round(40*m+rn(10))),security:cl(Math.round(48*m+rn(10))),foodSec:cl(Math.round(50*m+rn(10))),foreignRel:cl(Math.round(55*m+rn(10))),energy:cl(Math.round(40*m+rn(10)))},
+    treasury:diff==='brutal'?18:diff==='hard'?38:60,history:[],used:[],gameOver:false,ev:null};
+}
+function pickEv(){
+  let pool=EVENTS.filter(e=>!G.used.includes(e.id));
+  if(!pool.length){G.used=[];pool=EVENTS.slice();}
+  let ev;
+  if(G.stats.approval<35&&Math.random()<.4){const c=pool.filter(e=>e.cat==='crisis'||e.cat==='military');if(c.length)ev=c[rn(c.length)];}
+  if(!ev)ev=pool[rn(pool.length)];
+  G.used.push(ev.id);return ev;
+}
+function tick(){
+  G.treasury+=((G.stats.economy-50)*0.28);
+  const qol=(G.stats.economy+G.stats.healthcare+G.stats.foodSec+G.stats.energy+G.stats.security)/5;
+  G.stats.approval=cl(G.stats.approval+(qol>53?1:qol<42?-1:0));
+  if(G.diff==='hard'){G.stats.approval=cl(G.stats.approval-1);G.treasury-=0.8;}
+  if(G.diff==='brutal'){G.stats.approval=cl(G.stats.approval-2);G.treasury-=1.6;}
+  Object.keys(G.stats).forEach(k=>{if(k==='approval')return;const r=Math.random();G.stats[k]=cl(G.stats[k]+(r>.78?1:r<.22?-1:0));});
+}
+function applyFx(fx){for(const[k,v]of Object.entries(fx)){if(k==='treasury')G.treasury+=v;else if(G.stats[k]!==undefined)G.stats[k]=cl(G.stats[k]+v);}}
+function makeChoice(i){
+  if(!G.ev)return;
+  const c=G.ev.choices[i];
+  applyFx(c.fx);
+  G.history.push(G.ev.title);
+  showFb(Object.values(c.fx).reduce((a,b)=>a+b,0),c.fx);
+  G.turn++;tick();
+  if(chkOver())return;
+  if(G.turn>G.maxTurns){end(true,'');return;}
+  G.ev=pickEv();save();renderAll();
+  setTimeout(()=>document.getElementById('epanel').scrollIntoView({behavior:'smooth',block:'start'}),260);
+}
+function chkOver(){
+  let r='';
+  if(G.stats.approval<=3)r='The people lost all faith in your leadership. After days of massive nationwide protests, the National Assembly voted to remove you from office by a two-thirds majority.';
+  else if(G.treasury<=-100)r='The national treasury is bankrupt. The government cannot pay salaries, service any debt, or procure fuel. Economic collapse has forced your immediate resignation.';
+  else if(G.stats.military<=4&&G.stats.security<=8)r='Military morale completely collapsed. A faction of senior generals executed a coup at dawn. Your presidency has ended at gunpoint.';
+  if(r){G.gameOver=true;save();end(false,r);return true;}return false;
+}
+function end(won,reason){
+  show('over');
+  document.getElementById('oSeal').textContent=won?'🏆':'💔';
+  const v=document.getElementById('oVerd');v.textContent=won?'TERM COMPLETED':'PRESIDENCY ENDED';v.style.color=won?'var(--grn)':'var(--red)';
+  let sub='';
+  if(won){const ap=G.stats.approval;sub=ap>=70?'🌟 Legacy President — History will remember you as one of the great ones.':ap>=50?'✅ Competent Leader — The nation is better for your four years of service.':ap>=30?'⚠️ Controversial Term — History will judge you with deeply mixed feelings.':'😔 Barely Survived — You finished the term. Nobody is celebrating.';}
+  else sub=reason;
+  document.getElementById('oSub').textContent=sub;
+  const s=G.stats;
+  document.getElementById('fstats').innerHTML=[['Final Approval',s.approval+'%',vc(s.approval)],['Economy',s.economy,vc(s.economy)],['Treasury','₦'+G.treasury.toFixed(0)+'B',G.treasury>=0?'vo':'vb'],['Healthcare',s.healthcare,vc(s.healthcare)],['Security',s.security,vc(s.security)],['Education',s.education,vc(s.education)],['Infrastructure',s.infra,vc(s.infra)],['Foreign Relations',s.foreignRel,vc(s.foreignRel)],['Turns in Office',(G.turn-1)+'/'+G.maxTurns,'']].map(([l,v,c])=>`<div class="frow"><span>${l}</span><span class="${c}">${v}</span></div>`).join('');
+}
+
+// RENDER
+const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const SM=[{k:'economy',ic:'📈',lb:'Economy'},{k:'military',ic:'🪖',lb:'Military'},{k:'healthcare',ic:'❤️',lb:'Healthcare'},{k:'education',ic:'🎓',lb:'Education'},{k:'infra',ic:'🏗️',lb:'Infrastructure'},{k:'security',ic:'🛡️',lb:'Security'},{k:'foodSec',ic:'🌾',lb:'Food Security'},{k:'foreignRel',ic:'🌍',lb:'Foreign Rel.'},{k:'energy',ic:'⚡',lb:'Energy'}];
+function vc(v){return v>=70?'vg':v>=50?'vo':v>=30?'vw':v>=12?'vb':'vc'}
+function fc(v){return v>=70?'#18a86a':v>=50?'#1a8a5a':v>=30?'#d4a017':v>=12?'#c84040':'#ff2020'}
+function apc(v){return v>=60?'#18c878':v>=40?'#d4a017':v>=20?'#c84040':'#ff2020'}
+const CC={economy:'be',military:'bm',health:'bh',political:'bp',international:'bi',social:'bs',environment:'bn',crisis:'bc'};
+function renderStats(){
+  document.getElementById('sgrid').innerHTML=SM.map(m=>{const v=cl(G.stats[m.k]||0);return`<div class="si"><div class="sl"><span class="sn">${m.ic} ${m.lb}</span><span class="sv ${vc(v)}">${v}</span></div><div class="sbar"><div class="sfill" style="width:${v}%;background:${fc(v)}"></div></div></div>`;}).join('');
+  const tv=document.getElementById('tvEl');const t=G.treasury;tv.textContent=`₦${t.toFixed(0)}B`;tv.className='tval '+(t>=20?'vo':t>=0?'vw':'vb');
+}
+function renderTopbar(){
+  document.getElementById('hName').textContent='Pres. '+G.name;
+  document.getElementById('hCtry').textContent=G.country;
+  const mo=(G.turn-1)%12,yr=G.startYear+Math.floor((G.turn-1)/12);
+  document.getElementById('hDate').textContent=MN[mo]+' '+yr;
+  document.getElementById('hTerm').textContent='YEAR '+Math.ceil(G.turn/12)+' · TURN '+G.turn+'/'+G.maxTurns;
+  const ap=G.stats.approval,c=apc(ap);const p=document.getElementById('hAp');p.textContent=ap+'%';p.style.cssText=`background:${c}18;color:${c};border:1px solid ${c}35`;
+}
+function renderEvent(){
+  const ev=G.ev;if(!ev)return;
+  const cls=CC[ev.cat]||'bp';
+  document.getElementById('epanel').innerHTML=`<div class="emeta"><span class="ebadge ${cls}">${ev.cat.toUpperCase()}</span><span class="etrn">TURN ${G.turn} / ${G.maxTurns}</span></div><div class="etit">${ev.title}</div><div class="edsc">${ev.desc}</div>${ev.adv?`<div class="adv">${ev.adv}</div>`:''}<div class="choices">${ev.choices.map((c,i)=>`<button class="cbtn" onclick="makeChoice(${i})"><span class="clet">OPTION ${'ABC'[i]}</span>${c.t}${c.h?`<span class="chnt">↳ ${c.h}</span>`:''}</button>`).join('')}</div>`;
+}
+function renderHistory(){
+  const h=G.history;document.getElementById('hlist').innerHTML=h.length?h.slice(-6).reverse().map(x=>`<div class="hi">📰 ${x}</div>`).join(''):`<div class="hi" style="color:var(--dim)">No events yet...</div>`;
+}
+function renderAll(){renderTopbar();renderStats();renderEvent();renderHistory();}
+function showFb(total,fx){
+  const bar=document.getElementById('fbar');
+  const pos=Object.entries(fx).filter(([k,v])=>k!=='treasury'&&v>0).map(([k])=>k);
+  const neg=Object.entries(fx).filter(([k,v])=>k!=='treasury'&&v<0).map(([k])=>k);
+  let msg,cls;
+  if(total>5){msg=`✅ Decision executed. Positive impact on: ${pos.join(', ')}.`;cls='good';}
+  else if(total<-5){msg=`⚠️ This decision will have lasting consequences. Affected: ${neg.join(', ')}.`;cls='bad';}
+  else{msg=`📋 Decision recorded. Mixed short-term effects expected.`;cls='neu';}
+  bar.textContent=msg;bar.className='fbar show '+cls;setTimeout(()=>{bar.className='fbar';},4500);
+}
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.style.display='none');
+  const el=document.getElementById(id);el.style.display=(id==='start'||id==='over')?'flex':'block';
+}
+function save(){try{localStorage.setItem('prez_v4',JSON.stringify(G));}catch(e){}}
+function load(){try{const s=localStorage.getItem('prez_v4');return s?JSON.parse(s):null;}catch(e){return null;}}
+function startGame(){
+  const name=document.getElementById('iName').value.trim()||'Gideon';
+  const cs=document.getElementById('iCountry').value;
+  const country=cs==='Custom'?(document.getElementById('iCustom').value.trim()||'The Republic'):cs;
+  const diff=document.getElementById('iDiff').value;
+  G=fresh(name,country,diff);G.ev=pickEv();save();show('game');renderAll();
+}
+function resumeGame(){const s=load();if(s&&!s.gameOver&&s.turn<=s.maxTurns){G=s;if(!G.ev)G.ev=pickEv();show('game');renderAll();}}
+function resetToStart(){localStorage.removeItem('prez_v4');G={};document.getElementById('resumeBtn').style.display='none';show('start');}
+function toggleStats(){const b=document.getElementById('spBdy'),ic=document.getElementById('spIco');const h=b.style.display==='none';b.style.display=h?'block':'none';ic.textContent=h?'▼':'▶';}
+document.getElementById('iCountry').addEventListener('change',function(){document.getElementById('cGrp').style.display=this.value==='Custom'?'block':'none';});
+window.addEventListener('DOMContentLoaded',()=>{const s=load();if(s&&!s.gameOver&&s.turn<=s.maxTurns)document.getElementById('resumeBtn').style.display='block';show('start');});
+</script>
+</body>
+</html>
